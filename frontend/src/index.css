@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.dropdown-list{
+    display: none;
+}
+.dropdown:hover .dropdown-list{
+    display: block;
+    position: absolute;
+    left: 185px;
+    margin-top: -30px;
+}
+
+.active{
+    @apply text-blue-400
+}
