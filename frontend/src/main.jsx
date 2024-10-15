@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
-import { Home, Profile, SingleProduct, Cart, Checkout, Login, Signup, Shop, Payment, ManageAccount, Address, Cancellation, Favorits, Orders, ProfilePayment, Returns, Reviews, UserProfile } from './pages/index.js'
+import { Home, Profile, SingleProduct, Cart, Checkout, Login, Signup, Shop, Payment, ManageAccount, Address, Favorits, Orders, Returns, Reviews, UserProfile,OrderDetails } from './pages/index.js'
 
 const router = createBrowserRouter(
   [
@@ -28,10 +28,6 @@ const router = createBrowserRouter(
               path: "profile"
             },
             {
-              element: <ProfilePayment />,
-              path: "payment"
-            },
-            {
               element: <Address />,
               path: "address"
             },
@@ -44,8 +40,8 @@ const router = createBrowserRouter(
               path: "reviews"
             },
             {
-              element: <Cancellation />,
-              path: "cancellations"
+              element: <OrderDetails />,
+              path: "order-details/:id"
             },
             {
               element: <Orders />,
