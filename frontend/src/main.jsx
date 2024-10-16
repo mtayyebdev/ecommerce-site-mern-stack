@@ -3,7 +3,8 @@ import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
-import { Home, Profile, SingleProduct, Cart, Checkout, Login, Signup, Shop, Payment, ManageAccount, Address, Favorits, Orders, Returns, Reviews, UserProfile,OrderDetails } from './pages/index.js'
+import { Home, Profile, SingleProduct, Cart, Checkout, Login, Signup, Shop, Payment, ManageAccount, Address, Favorits, Orders, Returns, Reviews, UserProfile, OrderDetails } from './pages/index.js'
+import { Admin_home, Admin_Coupons, Admin_Home, Admin_Orders, Admin_Products, Admin_Profile, Admin_Settings, Admin_Users,Admin_Contacts } from './admin_pages/index.js'
 
 const router = createBrowserRouter(
   [
@@ -81,6 +82,43 @@ const router = createBrowserRouter(
         {
           element: <Payment />,
           path: "/payment"
+        },
+      ]
+    }, {
+      element: <Admin_home />,
+      path: "/web-admin",
+      children: [
+        {
+          element: <Admin_Home />,
+          path: ""
+        },
+        {
+          element: <Admin_Coupons />,
+          path: "coupons"
+        },
+        {
+          element: <Admin_Contacts />,
+          path: "contacts"
+        },
+        {
+          element: <Admin_Orders />,
+          path: "orders"
+        },
+        {
+          element: <Admin_Products />,
+          path: "products"
+        },
+        {
+          element: <Admin_Profile />,
+          path: "profile"
+        },
+        {
+          element: <Admin_Settings />,
+          path: "settings"
+        },
+        {
+          element: <Admin_Users />,
+          path: "users"
         },
       ]
     }
