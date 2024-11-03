@@ -5,7 +5,7 @@ function Footer() {
   return (
     <>
       <div>
-        <footer className="border-t bg-white border-gray-200 px-3">
+        <footer className="border-t bg-white border-gray-2 px-3">
           <div className="mx-auto w-full container">
             <div className="grid grid-cols-2 gap-8 py-6 lg:py-8 md:grid-cols-4">
               <div>

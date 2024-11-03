@@ -12,11 +12,16 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
       >
         {/* <!-- SIDEBAR HEADER --> */}
         <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
+          <div className="flex items-center gap-1">
           <NavLink to="/" className={"flex items-center animate-pulse"}>
             {/* <img src='/sliderimg/p3.webp' className='w-[30px]' alt="Logo" /> */}
             <h2 className='text-2xl font-semibold text-white'>Shop</h2>
             <h2 className='text-2xl font-semibold text-site-color'>Hub</h2>
           </NavLink>
+          <NavLink to="/web-admin">
+            <h2 className='text-base font-semibold text-white mt-1 hover:text-primary'>/Admin</h2>
+          </NavLink>
+          </div>
 
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -55,16 +60,7 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
                     Users
                   </NavLink>
                 </li>
-                <li>
-                  <NavLink
-                    to="/web-admin/profile"
-                    className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark ${pathname.includes('profile') && 'bg-graydark'
-                      }`}
-                  >
-                    <i class="fa-solid fa-user text-xl"></i>
-                    Profile
-                  </NavLink>
-                </li>
+               
                 <li>
                   <NavLink
                     to="/web-admin/products"

@@ -4,7 +4,7 @@ import App from './App.jsx'
 import './index.css'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import { Home, Profile, SingleProduct, Cart, Checkout, Login, Signup, Shop, Payment, ManageAccount, Address, Favorits, Orders, Returns, Reviews, UserProfile, OrderDetails } from './pages/index.js'
-import { Admin_home, Admin_Coupons, Admin_Home, Admin_Orders, Admin_Products, Admin_Profile, Admin_Settings, Admin_Users,Admin_Contacts } from './admin_pages/index.js'
+import { Admin_home, Admin_Coupons, Admin_Home, Update_user, Admin_Orders, Admin_Products, Admin_Settings, Admin_Users, Admin_Contacts } from './admin_pages/index.js'
 
 const router = createBrowserRouter(
   [
@@ -105,12 +105,12 @@ const router = createBrowserRouter(
           path: "orders"
         },
         {
-          element: <Admin_Products />,
-          path: "products"
+          element: <Update_user />,
+          path: "update-user"
         },
         {
-          element: <Admin_Profile />,
-          path: "profile"
+          element: <Admin_Products />,
+          path: "products"
         },
         {
           element: <Admin_Settings />,
