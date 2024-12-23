@@ -1,13 +1,90 @@
-import React, { useState } from 'react'
-import {Link} from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import { UpdateOrder } from '../store/slices/orderSlices/UpdateOrderSlice.jsx'
+import { GetSingleOrder } from '../store/slices/orderSlices/GetSingleOrderSlice.jsx'
+import { ClearData } from '../store/slices/orderSlices/PendingOrderSlice.jsx'
 
 function Payment() {
+    const { id } = useParams()
     const [easypaisa, seteasypaisa] = useState(false)
     const [jazzcash, setjazzcash] = useState(false)
     const [craditcard, setcraditcard] = useState(false)
     const [bank, setbank] = useState(false)
     const [cashonDelivary, setcashonDelivary] = useState(false)
     const [orderbox, setorderbox] = useState(false)
+
+
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+
+    const { orders } = useSelector((state) => state.pendingorder)
+    const [subItemsPrice, setsubItemsPrice] = useState(0)
+    const [ids, setids] = useState([]);
+    const [totalPrice, settotalPrice] = useState(0)
+
+    const getData = async () => {
+        let totalShipping = 0;
+        let subItems = 0;
+        if (orders.length != 0 && id == "1234") {
+            orders[0].forEach((order, i) => {
+                subItems += order.price;
+                setids((prev) => [...prev, order._id])
+                totalShipping += order.shippingFee;
+            })
+            let total = subItems + totalShipping;
+            setsubItemsPrice(subItems);
+            settotalPrice(total);
+        } else if (id != "1234") {
+            if (!id) {
+                return null
+            }
+
+            await dispatch(GetSingleOrder(id))
+                .then((res) => {
+                    if (res.type === "getsingleorder/fulfilled") {
+                        setsubItemsPrice(res.payload.order.price)
+                        settotalPrice(res.payload.order.price + res.payload.order.shippingFee)
+                        setids([id])
+                    }
+                }).catch((err) => {
+                    console.log(err);
+                })
+        } else {
+            return null
+        }
+    }
+
+    const cashOnDelivaryHandler = async () => {
+        const data = {
+            orderStatus: "On Route",
+            paymentStatus: "Done",
+            paymentType: "CachOnDelivary",
+            shipping_fee: 50,
+            orderId:""
+        }
+        const order = Promise.all(
+            ids.map(async (ide) => {
+                data.orderId = ide;
+
+                await dispatch(UpdateOrder(data))
+                return true
+            })
+        )
+        if (order) {
+            setorderbox(true)
+            dispatch(ClearData())
+        } else {
+            console.log("updating error.....");
+        }
+    }
+
+
+
+    useEffect(() => {
+        getData()
+    }, [])
+
     return (
         <>
             <div className="w-full py-5 h-auto md:h-screen relative">
@@ -49,7 +126,7 @@ function Payment() {
                             </div>
 
                             {/* jazzcash box......................... */}
-                            <div className="box w-[130px] h-[130px] flex items-center cursor-pointer justify-center flex-col text-center bg-white" onClick={()=>setjazzcash(true)}>
+                            <div className="box w-[130px] h-[130px] flex items-center cursor-pointer justify-center flex-col text-center bg-white" onClick={() => setjazzcash(true)}>
                                 <img src="/payments/jazzcash.png" className='w-[100px]' alt="payment" />
                                 <h2 className='text-sm font-semibold text-gray-500 mt-2 text-center'>JazzCash</h2>
                             </div>
@@ -94,18 +171,18 @@ function Payment() {
                                         <input type="text" id="box" className='py-2 w-[300px] px-3 border border-gray-400 outline-none focus:border-blue-400' placeholder='Name on card' />
                                     </div>
                                     <div className="flex items-center gap-4 mt-5">
-                                    <div className="flex flex-col">
-                                        <label htmlFor="box">
-                                            <p className='text-xs text-gray-600 mb-1'>Expiration date</p>
-                                        </label>
-                                        <input type="text" id="box" className='py-2 w-[185px] px-3 border border-gray-400 outline-none focus:border-blue-400' placeholder='MM/YY' />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <label htmlFor="box">
-                                            <p className='text-xs text-gray-600 mb-1'>CVV</p>
-                                        </label>
-                                        <input type="text" id="box" className='py-2 w-[100px] px-3 border border-gray-400 outline-none focus:border-blue-400' placeholder='CVV' />
-                                    </div>
+                                        <div className="flex flex-col">
+                                            <label htmlFor="box">
+                                                <p className='text-xs text-gray-600 mb-1'>Expiration date</p>
+                                            </label>
+                                            <input type="text" id="box" className='py-2 w-[185px] px-3 border border-gray-400 outline-none focus:border-blue-400' placeholder='MM/YY' />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <label htmlFor="box">
+                                                <p className='text-xs text-gray-600 mb-1'>CVV</p>
+                                            </label>
+                                            <input type="text" id="box" className='py-2 w-[100px] px-3 border border-gray-400 outline-none focus:border-blue-400' placeholder='CVV' />
+                                        </div>
                                     </div>
                                     <button className='bg-site-color text-white py-2 w-[300px] mt-7 rounded hover:bg-orange-600 text-lg font-semibold'>Pay Now</button>
                                 </div>
@@ -145,15 +222,15 @@ function Payment() {
                                 <div className="box w-[95%] sm:w-[80%] lg:w-[50%] bg-white text-black border border-gray-100 text-sm shadow-md py-10 px-3 relative">
                                     <i className='fa-solid fa-close text-xl cursor-pointer absolute top-3 right-4 hover:text-blue-400' onClick={() => setcashonDelivary(false)}></i>
                                     <p>- You may pay in cash to our courier upon receiving your parcel at the doorstep</p>
-                                   
+
                                     <p className="mt-3">- Before agreeing to receive the parcel, check if your delivery status has been updated to 'Out for Delivery'</p>
-                                   
+
                                     <p className='mt-3'>- Before receiving, confirm that the airway bill shows that the parcel is from Daraz</p>
                                     <p className='mt-3'>- Before you make payment to the courier, confirm your order number, sender information and tracking number on the parcel</p>
                                     <p className='mt-3'>- Cash Payment Fee of Rs. 50 applies only to Cash on Delivery payment method. There is no extra fee when using other payment methods</p>
 
-                                   
-                                    <button className='bg-site-color text-white py-2 w-[250px] mt-7 rounded hover:bg-orange-600 text-lg font-semibold' onClick={()=>setorderbox(true)}>Confirm Order</button>
+
+                                    <button className='bg-site-color text-white py-2 w-[250px] mt-7 rounded hover:bg-orange-600 text-lg font-semibold' onClick={cashOnDelivaryHandler}>Confirm Order</button>
                                 </div>
                             </div>
 
@@ -175,12 +252,12 @@ function Payment() {
                         <div className="right w-full md:w-[40%] lg:w-[30%] bg-white py-8 h-[170px] px-3">
                             <h2 className='font-semibold text-lg'>Order Summary</h2>
                             <div className="flex items-center justify-between gap-2 my-4">
-                                <h3 className='text-xs text-gray-400'>Subtotal(3 Items and shipping fee included)</h3>
-                                <h3 className='text-sm whitespace-nowrap'>Rs. 346543</h3>
+                                <h3 className='text-xs text-gray-400'>Subtotal({orders && orders.length} Items and shipping fee included)</h3>
+                                <h3 className='text-sm whitespace-nowrap'>Rs. {subItemsPrice}</h3>
                             </div>
                             <div className="flex items-center flex-row gap-2 justify-between">
                                 <h2 className='text-base font-semibold'>Total Amount</h2>
-                                <h2 className='text-lg font-semibold text-site-color whitespace-nowrap'>Rs. 32746</h2>
+                                <h2 className='text-lg font-semibold text-site-color whitespace-nowrap'>Rs. {totalPrice}</h2>
                             </div>
                         </div>
                     </div>

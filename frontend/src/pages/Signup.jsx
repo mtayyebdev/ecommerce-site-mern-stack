@@ -1,7 +1,54 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from 'react-redux'
+import { SignUp } from '../store/slices/userSlices/SignupSlice'
 
 function Signup() {
+  const navigate = useNavigate()
+  const { loader } = useSelector((state) => state.signup)
+  const dispatch = useDispatch()
+  const [username, setusername] = useState("")
+  const [phone, setphone] = useState(0)
+  const [smsCode, setsmsCode] = useState(0)
+  const [password, setpassword] = useState("")
+  const [birthday, setbirthday] = useState()
+  const [gender, setgender] = useState("")
+  const [randomint, setrandomint] = useState(Math.floor(Math.random() * 10))
+  const [email, setemail] = useState(`example@7%.com`)
+
+  const changeInt = () => {
+    setrandomint(Math.floor(Math.random() * 1000))
+    setemail(`example@${randomint}.com`)
+  }
+
+  const handleSignup = () => {
+    changeInt();
+
+    let formdata = new FormData();
+    formdata.append("name", username);
+    formdata.append("phone", phone);
+    formdata.append("password", password);
+    formdata.append("birthday", birthday);
+    formdata.append("gender", gender);
+    formdata.append("email", email);
+
+    dispatch(SignUp(formdata))
+      .then((res) => {
+        if (res.type === "signup/fulfilled") {
+          setusername("")
+          setphone(0)
+          setsmsCode(0)
+          setpassword("")
+          setbirthday()
+          setgender("")
+          changeInt()
+          navigate("/login")
+        }
+      }).catch((err) => {
+        console.log(err)
+      })
+  }
+
   return (
     <>
       <div className="w-full">
@@ -31,6 +78,8 @@ function Signup() {
                     <input
                       type="text"
                       name="phone"
+                      value={phone}
+                      onChange={(e) => setphone(e.target.value)}
                       id="phone"
                       placeholder="Please enter your phone number..."
                       className="outline-none w-full text-sm py-2 px-2 pe-10 border border-gray-300"
@@ -45,6 +94,8 @@ function Signup() {
                   <input
                     type="number"
                     name="sms"
+                    value={smsCode}
+                    onChange={(e) => setsmsCode(e.target.value)}
                     id="sms"
                     placeholder="6 digits"
                     className="outline-none w-full py-2 px-2 text-sm border border-gray-300"
@@ -58,6 +109,8 @@ function Signup() {
                     <input
                       type="text"
                       name="password"
+                      value={password}
+                      onChange={(e) => setpassword(e.target.value)}
                       id="password"
                       placeholder="Minimum 6 characters with a number and latter"
                       className="outline-none w-full py-2 px-2 pe-20 border border-gray-300 text-sm"
@@ -75,6 +128,8 @@ function Signup() {
                     </div>
                     <input
                       type="date"
+                      value={birthday}
+                      onChange={(e) => setbirthday(e.target.value)}
                       name="day"
                       id="day"
                       className="outline-none w-full py-2 px-2 text-sm border border-gray-300"
@@ -87,6 +142,7 @@ function Signup() {
                     <select
                       name="gender"
                       id="gender"
+                      onChange={(e) => setgender(e.target.value)}
                       className="outline-none w-full py-2 px-2 text-sm border border-gray-300"
                     >
                       <option>Select</option>
@@ -106,6 +162,8 @@ function Signup() {
                     <input
                       type="text"
                       name="name"
+                      value={username}
+                      onChange={(e) => setusername(e.target.value)}
                       id="name"
                       placeholder="First Last"
                       className="outline-none w-full py-2 px-2 pe-10 text-sm border border-gray-300"
@@ -120,10 +178,11 @@ function Signup() {
                   </p>
                 </div>
                 <button
+                  onClick={handleSignup}
                   type="submit"
                   className="text-white bg-site-color hover:bg-orange-500 py-3 w-full text-base mt-6"
                 >
-                  SignUp
+                  {loader ? "Loading..." : "SIGN UP"}
                 </button>
                 <div className="mt-4">
                   <p className="text-xs">

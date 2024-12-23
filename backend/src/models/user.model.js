@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema(
     },
     totalBuys: {
       total: {
-        type: String,
+        type: Number,
         default: 0,
       },
       products: [
@@ -45,7 +45,6 @@ const userSchema = new mongoose.Schema(
     },
     isAdmin: {
       type: Boolean,
-      required: true,
       default: false,
     },
   },

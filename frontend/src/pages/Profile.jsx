@@ -1,8 +1,11 @@
 import React, { useState } from 'react'
 import { Outlet, NavLink } from 'react-router-dom'
+import { useSelector} from 'react-redux'
 
 function Profile() {
+  const {user} = useSelector((state) => state.userdata)
   const [menu, setmenu] = useState(false)
+  
   return (
     <>
       <div className="w-full py-5">
@@ -15,7 +18,7 @@ function Profile() {
             <aside className={`w-64 lg:w-[200px] p-3 absolute lg:static bg-white top-0 h-full min-h-[450px] lg:bg-transparent shadow-md lg:shadow-none rounded-lg lg:rounded-none ${menu ? "translate-x-0" : "-translate-x-[200%]"} transition-all lg:block lg:translate-x-0`}>
               <i className='fa-solid fa-close absolute right-5 top-3 text-lg hover:text-blue-500 cursor-pointer lg:hidden' onClick={() => setmenu(false)}></i>
               <div className="mb-6">
-                <h2 className="text-xs font-semibold">Hello, M Tayyeb</h2>
+                <h2 className="text-xs font-semibold">Hello, {user && user.data.name}</h2>
                 <div className="flex items-center text-sm text-green-600">
                   {/* <CheckCircle className="mr-1 h-4 w-4" /> */}
                   <i className='fa-solid fa-check-circle mr-1 text-lg'></i>

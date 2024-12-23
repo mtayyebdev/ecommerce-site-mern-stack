@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Navigation,
@@ -10,6 +10,8 @@ import {
   Controller,
 } from "swiper/modules";
 import { Product } from "../components/index.js";
+import { useDispatch, useSelector } from 'react-redux'
+import { GetProducts } from '../store/slices/productSlices/GetProductsSlice.jsx'
 
 import { Swiper, SwiperSlide } from "swiper/react";
 
@@ -20,52 +22,14 @@ import "swiper/css/pagination";
 import "swiper/css/scrollbar";
 
 function Home() {
+  const {products}=useSelector((state)=>state.getproducts)
+  const dispatch = useDispatch()
   const [showMore, setshowMore] = useState(20);
 
-  const products = [
-    {
-      id:1,
-      image: "/sliderimg/p1.webp",
-      name: "Airpods_Pro Wireless Earbuds Bluetooth 5.0",
-      price: 200,
-      discount: 500,
-    },
-    {
-      id:2,
-      image: "/sliderimg/p2.webp",
-      name: "Samsung Galaxy Watch 4 - Smartwatch",
-      price: 250,
-      discount: 300,
-    },
-    {
-      id:3,
-      image: "/sliderimg/p3.webp",
-      name: "Sony WH-1000XM4 Noise Cancelling Headphones",
-      price: 350,
-      discount: 400,
-    },
-    {
-      id:4,
-      image: "/sliderimg/p4.webp",
-      name: "Apple iPhone 14 Pro - 256GB",
-      price: 1200,
-      discount: 1500,
-    },
-    {
-      id:5,
-      image: "/sliderimg/p5.webp",
-      name: "Bose SoundLink Revolve+ Bluetooth Speaker",
-      price: 150,
-      discount: 250,
-    },
-    {
-      id:6,
-      image: "/sliderimg/p6.webp",
-      name: "Logitech MX Master 3 Wireless Mouse",
-      price: 100,
-      discount: 180,
-    },
-  ];
+  useEffect(() => {
+    dispatch(GetProducts())
+  }, [])
+  
 
   return (
     <>
@@ -91,7 +55,7 @@ function Home() {
                 autoplay={true}
                 // navigation
                 pagination={{ clickable: true }}
-                // scrollbar={{ draggable: true }}
+              // scrollbar={{ draggable: true }}
               >
                 <SwiperSlide>
                   <img src="/sliderimg/img1.webp" alt="slide1" />
@@ -134,13 +98,14 @@ function Home() {
                 </Link>
               </div>
               <div className="products my-2 flex items-center flex-wrap lg:flex-nowrap gap-3 justify-center">
-                {products.slice(0, 6).map((data, i) => {
+                {products && products.data.slice(0, 6).map((data, i) => {
                   return (
                     <Product
                       key={i}
-                      image={data.image}
+                      image={data.frontImage}
+                      id={data._id}
                       name={data.name}
-                      discount={data.discount}
+                      discount={data.discountPrice}
                       price={data.price}
                     />
                   );
@@ -154,15 +119,15 @@ function Home() {
             <h2 className="text-2xl font-semibold">Just For You</h2>
             <div className="w-full flex flex-col bg-white mt-1">
               <div className="products my-2 flex items-center flex-wrap gap-3 justify-center">
-                {products.slice(0, showMore).map((data, i) => {
+                {products && products.data.slice(0, showMore).map((data, i) => {
                   return (
                     <Product
                       key={i}
-                      image={data.image}
+                      image={data.frontImage}
                       name={data.name}
-                      discount={data.discount}
+                      discount={data.discountPrice}
                       price={data.price}
-                      id={data.id}
+                      id={data._id}
                     />
                   );
                 })}

@@ -11,22 +11,31 @@ const cartSchema = new mongoose.Schema(
       required: true,
     },
     price: {
-      type: String,
+      type: Number,
       required: true,
       default: 0,
     },
     discount: {
-      type: String,
+      type: Number,
       required: true,
       default: 0,
     },
     deliveryPrice: {
-      type: String,
+      type: Number,
       required: true,
     },
     quantity: {
+      type: Number,
+      required: true,
+      default: 1,
+    },
+    guarantee: {
       type: String,
       required: true,
+    },
+    category: {
+      type: String,
+      required: true
     },
     color:String,
     size:String,

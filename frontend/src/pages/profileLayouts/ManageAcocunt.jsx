@@ -1,7 +1,17 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import { GetOrders } from '../../store/slices/orderSlices/GetOrdersSlice.jsx'
 
 function ManageAccount() {
+    const dispatch = useDispatch()
+    const { orders } = useSelector(state => state.getorders)
+    const { user } = useSelector((state) => state.userdata)
+
+
+    useEffect(async() => {
+        await dispatch(GetOrders())
+    }, [GetOrders])
     return (
         <>
             <div className="mt-3">
@@ -15,7 +25,7 @@ function ManageAccount() {
                             {/* <p>|</p>
                             <a href="#" className="text-blue-500 text-sm mt-1">EDIT</a> */}
                         </div>
-                        <p className="mt-2 text-gray-700">M Tayyeb</p>
+                        <p className="mt-2 text-gray-700">{user && user.data.name}</p>
                         <div className="mt-4">
                             <label className="inline-flex items-center">
                                 <input type="checkbox" checked className="form-checkbox text-orange-500" />
@@ -67,28 +77,21 @@ function ManageAccount() {
                             </thead>
                             <tbody>
                                 {/* <!-- Order 1 --> */}
-                                <tr className='border-b'>
-                                    <td className="px-4 py-2 whitespace-nowrap text-gray-800">197437108304553</td>
-                                    <td className="px-4 py-2 whitespace-nowrap text-gray-800">11/10/2024</td>
-                                    <td className="px-4 py-2 whitespace-nowrap">
-                                        <img src="/sliderimg/p3.webp" alt="item" className="h-10 w-10" />
-                                    </td>
-                                    <td className="px-4 py-2 whitespace-nowrap text-gray-800">Rs. 527</td>
-                                    <td className="px-4 py-2 whitespace-nowrap text-blue-500">
-                                        <Link to={`/user/order-details/3`} className="hover:underline">MANAGE</Link>
-                                    </td>
-                                </tr>
-                                <tr className='border-b'>
-                                    <td className="px-4 py-2 whitespace-nowrap text-gray-800">197437108304553</td>
-                                    <td className="px-4 py-2 whitespace-nowrap text-gray-800">11/10/2024</td>
-                                    <td className="px-4 py-2 whitespace-nowrap">
-                                        <img src="/sliderimg/p3.webp" alt="item" className="h-10 w-10" />
-                                    </td>
-                                    <td className="px-4 py-2 whitespace-nowrap text-gray-800">Rs. 527</td>
-                                    <td className="px-4 py-2 whitespace-nowrap text-blue-500">
-                                    <Link to={`/user/order-details/3`} className="hover:underline">MANAGE</Link>
-                                    </td>
-                                </tr>
+                                {
+                                    orders && orders.data.map((order) => (
+                                        <tr className='border-b'>
+                                            <td className="px-4 py-2 whitespace-nowrap text-gray-800">{order.orderId}</td>
+                                            <td className="px-4 py-2 whitespace-nowrap text-gray-800">{order.deliveryDate}</td>
+                                            <td className="px-4 py-2 whitespace-nowrap">
+                                                <img src={order.image} alt="item" className="h-10 w-10" />
+                                            </td>
+                                            <td className="px-4 py-2 whitespace-nowrap text-gray-800">Rs. {order.price}</td>
+                                            <td className="px-4 py-2 whitespace-nowrap text-blue-500">
+                                                <Link to={`/user/order-details/${order._id}`} className="hover:underline">MANAGE</Link>
+                                            </td>
+                                        </tr>
+                                    ))
+                                }
                             </tbody>
                         </table>
                     </div>

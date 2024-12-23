@@ -3,6 +3,7 @@ import Product from "../models/product.model.js";
 
 const createCartController = async (req, res, next) => {
   try {
+    const {quantity}=req.body;
     const id = req.params.id;
 
     if (!id) {
@@ -15,17 +16,22 @@ const createCartController = async (req, res, next) => {
       return res.status(404).json({ message: "Product not found..." });
     }
 
+    const totalPrice = quantity * product.price;
+    const totalDeliveryPrice = quantity * product.deliveryPrice;
+
     const cart = await Cart.create({
       name: product.name,
       image: product.frontImage,
-      price: product.price,
+      price: totalPrice,
       discount: product.discountPrice,
-      deliveryPrice: product.deliveryPrice,
+      deliveryPrice: totalDeliveryPrice,
       product: product._id,
       user: req.user._id,
       color: product.color,
       size: product.size,
-      quantity: 0,
+      category: product.category,
+      guarantee: product.warranty,
+      quantity,
     });
 
     if (!cart) {
@@ -40,7 +46,7 @@ const createCartController = async (req, res, next) => {
 
 const getCartController = async (req, res, next) => {
   try {
-    const carts = await Cart.find({ _id: req.user._id });
+    const carts = await Cart.find({ user: req.user._id });
 
     if (!carts) {
       return res.status(404).json({ message: "Not found." });
@@ -67,20 +73,43 @@ const deleteCartController = async (req, res, next) => {
   }
 };
 
+const deleteAllCartsController = async (req, res, next) => {
+  try {
+    const carts = await Cart.deleteMany({user:req.user._id});
+    
+    if (!carts) {
+      return res.status(404).json({ message: "Not found." });
+    }
+
+    return res.status(200).json({ message: "Carts Deleted Successfully." });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const updateCartController = async (req, res, next) => {
   try {
     const id = req.params.id;
     const { quantity } = req.body;
-
+    
     if (!quantity) {
       return res.status(404).json({ message: "Qunatity not found." });
     }
 
-    const carts = await Cart.findByIdAndUpdate(id, {
-      quantity,
-    });
+    const cart = await Cart.findById(id);  
+    
+    if (!cart) {
+      return res.status(404).json({ message: "Not found." });
+    }
 
-    if (!carts) {
+    const findProduct =await Product.findById(cart.product)
+
+    cart.price = quantity * findProduct.price;
+    cart.deliveryPrice = quantity * findProduct.deliveryPrice;
+    cart.quantity = quantity;
+    await cart.save();
+
+    if (!updatedCart) {
       return res.status(404).json({ message: "Not found." });
     }
 
@@ -95,4 +124,5 @@ export {
   createCartController,
   deleteCartController,
   updateCartController,
+  deleteAllCartsController
 };

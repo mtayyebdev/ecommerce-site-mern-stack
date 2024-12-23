@@ -12,18 +12,16 @@ import {
   getUserInfoController,
   getUserOrdersController,
   updateUserController,
+  getSingleOrderController,
   updateUserInfoController,
   updateUserPasswordController,
+  updateOrderController,
 } from "../controllers/auth.controller.js";
 
 const AuthRouter = express.Router();
 
-AuthRouter.route("/login").post(UserVerify, LoginController);
-AuthRouter.route("/signup").post(
-  UserVerify,
-  upload.single("file"),
-  SignUpController
-);
+AuthRouter.route("/login").post(LoginController);
+AuthRouter.route("/signup").post(upload.single("file"), SignUpController);
 AuthRouter.route("/logout").get(UserVerify, LogoutController);
 AuthRouter.route("/createinfo").post(UserVerify, createUserInfoController);
 AuthRouter.route("/createorder").post(UserVerify, createUserOrderController);
@@ -41,5 +39,7 @@ AuthRouter.route("/updatepassword").patch(
   UserVerify,
   updateUserPasswordController
 );
+AuthRouter.route("/updateorder/:id").patch(UserVerify, updateOrderController);
+AuthRouter.route("/getorder/:id").get(UserVerify, getSingleOrderController);
 
 export default AuthRouter;

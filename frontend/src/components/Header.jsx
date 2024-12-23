@@ -1,18 +1,49 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from 'react-redux'
+import { UserData } from '../store/slices/userSlices/UserdataSlice'
+import { Logout } from '../store/slices/userSlices/LogoutSlice'
+import { GetCart } from '../store/slices/cartSlices/GetCartSlice.jsx'
+
 
 function Header() {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const { user } = useSelector((state) => state.userdata);
+  const { cart } = useSelector((state) => state.getcart)
   const [searchBox, setsearchBox] = useState("")
   const [list, setlist] = useState(false)
 
+  useEffect(() => {
+    dispatch(UserData())
+    dispatch(GetCart())
+  }, [])
+
   const searchHandler = (e) => {
     setsearchBox(e.target.value)
-    if(e.target.value.length >=1){
+    if (e.target.value.length >= 1) {
       setlist(true)
-    }else{
+    } else {
       setlist(false)
     }
   }
+
+  const logoutHandler = async () => {
+    try {
+      // Step 1: Logout the user
+      await dispatch(Logout());
+
+      // Step 2: Optionally clear user data and cart if required
+      await dispatch(UserData());
+      await dispatch(GetCart());
+
+      // Step 3: Navigate to the home page
+      // navigate("/");
+    } catch (error) {
+      console.error("Logout process failed:", error);
+    }
+  }
+
 
   return (
     <>
@@ -28,19 +59,21 @@ function Header() {
                   HELP & SUPPORT
                 </Link>
               </li>
+              {user !== null ? <li onClick={logoutHandler} className="hover:text-gray-200 cursor-pointer">LOGOUT</li> : <>
+                <li>
+                  <Link to={"/login"} className="hover:text-gray-200">
+                    LOGIN
+                  </Link>
+                </li>
+                <li>
+                  <Link to={"/signup"} className="hover:text-gray-200">
+                    SIGNUP
+                  </Link>
+                </li>
+              </>}
               <li>
-                <Link to={"/login"} className="hover:text-gray-200">
-                  LOGIN
-                </Link>
-              </li>
-              <li>
-                <Link to={"/signup"} className="hover:text-gray-200">
-                  SIGNUP
-                </Link>
-              </li>
-              <li>
-                <Link to={"/user"} className="hover:text-gray-200">
-                  M TAYYEB'S ACOOUNT
+                <Link to={"/user"} className="hover:text-gray-200 uppercase">
+                  {user && user.data.name} ACCOUNT
                 </Link>
               </li>
               <li>
@@ -68,7 +101,7 @@ function Header() {
                     onChange={searchHandler}
                     placeholder="Search Here..."
                   />
-                  <div className={`absolute ${list?"block":"hidden"} top-10 left-0 text-black bg-white w-full py-1 shadow-md`}>
+                  <div className={`absolute ${list ? "block" : "hidden"} top-10 left-0 text-black bg-white w-full py-1 shadow-md`}>
                     <ul>
                       <li className="my-1 hover:bg-slate-100">
                         <Link to={"/shop?search=home"} className="w-full">
@@ -87,21 +120,37 @@ function Header() {
               <div className="cart ms-5 md:ms-8">
                 <Link
                   to={"/cart"}
-                  className="py-1 px-2 sm:py-2 sm:px-3 text-lg text-site-color hover:bg-[rgb(241,206,188)] bg-[rgb(255,225,210)]"
+                  className="py-1 px-2 relative sm:py-2 sm:px-3 text-lg text-site-color hover:bg-[rgb(241,206,188)] bg-[rgb(255,225,210)]"
                 >
+                  <p className="absolute -top-1 -right-1 text-white text-xs bg-blue-500 rounded-full w-5 h-5 flex items-center justify-center">{cart && cart.data.length}</p>
                   <i className="fa-solid fa-cart-shopping"></i>
                 </Link>
               </div>
             </div>
           </div>
           <div className="items-center w-full flex sm:hidden">
-            <input
-              type="text"
-              className="py-2 px-3 outline-none w-full border-white border text-base bg-white text-black"
-              name="search"
-              id="search"
-              placeholder="Search Here..."
-            />
+            <div className="relative">
+              <input
+                type="text"
+                className="py-2 px-3 outline-none w-full border-white border text-base bg-white text-black"
+                name="search"
+                id="search"
+                value={searchBox}
+                onChange={searchHandler}
+                placeholder="Search Here..."
+              />
+              <div className={`absolute ${list ? "block" : "hidden"} top-10 left-0 text-black bg-white w-full py-1 shadow-md`}>
+                <ul>
+                  <li className="my-1 hover:bg-slate-100">
+                    <Link to={"/shop?search=home"} className="w-full">
+                      <div className="py-1 px-3">
+                        <h3>decorations</h3>
+                      </div>
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+            </div>
             <button className="text-site-color bg-[rgb(255,225,210)] hover:bg-[rgb(241,206,188)] text-xl py-[7px] px-3">
               <i className="fa-solid fa-search"></i>
             </button>

@@ -9,7 +9,9 @@ import { v4 as uuidv4 } from "uuid";
 const SignUpController = async (req, res, next) => {
   try {
     const { name, email, phone, password, gender, birthday } = req.body;
-    const file = req.file;
+    const file = req.file
+      ? req.file
+      : "https://cdn.pixabay.com/photo/2023/12/05/19/05/mulled-claret-8432310_640.jpg";
 
     if (
       !name ||
@@ -20,34 +22,34 @@ const SignUpController = async (req, res, next) => {
       !birthday ||
       !file
     ) {
-      return res.status(201).json({
+      return res.status(404).json({
         message: "Please fill all the fields...",
       });
     }
 
-    const userExist = await User.findOne({ email });
+    const userExist = await User.findOne({ phone });
 
     if (userExist) {
-      return res.status(201).json({ message: "Invalid User..." });
+      return res.status(404).json({ message: "Invalid User..." });
     }
 
     const rounds = await bcrypt.genSalt(10);
     const hashedPass = await bcrypt.hash(password, rounds);
 
-    const image = await UploadFile(file.path);
+    const image = file.path ? await UploadFile(file.path) : "";
 
     const user = await User.create({
       name,
       email,
       password: hashedPass,
-      avatar: image.url,
+      avatar: image.url ? image.url : file,
       gender,
       birthday,
       phone,
     });
 
     if (!user) {
-      return res.status(201).json({ message: "Invalid User..." });
+      return res.status(404).json({ message: "Invalid User..." });
     }
 
     return res.status(200).json({
@@ -60,31 +62,32 @@ const SignUpController = async (req, res, next) => {
 
 const LoginController = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { phone, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(201).json({
+    if (!phone || !password) {
+      return res.status(404).json({
         message: "Please fill all the fields...",
       });
     }
 
-    const emailExist = await User.findOne({ email });
+    const phoneExist = await User.findOne({ phone });
 
-    if (!emailExist) {
-      return res.status(201).json({ message: "Invalid User..." });
+    if (!phoneExist) {
+      return res.status(404).json({ message: "Invalid Phone or Password..." });
     }
 
-    const passExist = await bcrypt.compare(password, emailExist.password);
+    const passExist = await bcrypt.compare(password, phoneExist.password);
 
     if (!passExist) {
-      return res.status(201).json({ message: "Invalid User..." });
+      return res.status(404).json({ message: "Invalid Phone or Password..." });
     }
 
-    const jwtToken = await jwt.sign(
+    const jwtToken = jwt.sign(
       {
-        id: emailExist._id,
-        emailId: emailExist.email,
-        admin: emailExist.isAdmin,
+        id: phoneExist._id,
+        phoneId: phoneExist.phone,
+        emailId: phoneExist.email,
+        admin: phoneExist.isAdmin,
       },
       process.env.JWT_SECRET,
       {
@@ -92,12 +95,14 @@ const LoginController = async (req, res, next) => {
       }
     );
 
-    const token = res.cookie("token", jwtToken, {
+    const tenDaysInMilliseconds = 10 * 24 * 60 * 60 * 1000; // 10 days
+
+    res.cookie("token", jwtToken, {
       httpOnly: true,
-      maxAge: 10 * 24 * 60 * 60 * 1000,
+      maxAge: tenDaysInMilliseconds,
     });
 
-    return res.status(200).json({ message: "Login Successfully...", token });
+    return res.status(200).json({ message: "Login Successfully..." });
   } catch (error) {
     next(error);
   }
@@ -108,7 +113,7 @@ const getUserController = async (req, res, next) => {
     const user = await User.findById(req.user._id);
 
     if (!user) {
-      return res.status(201).json({ message: "Inavlid User" });
+      return res.status(404).json({ message: "Inavlid User" });
     }
 
     return res
@@ -146,7 +151,7 @@ const updateUserController = async (req, res, next) => {
     });
 
     if (!user) {
-      return res.status(201).json({ message: "Invalid User..." });
+      return res.status(404).json({ message: "Invalid User..." });
     }
 
     return res.status(200).json({ message: "User updated Successfully." });
@@ -160,13 +165,13 @@ const updateUserPasswordController = async (req, res, next) => {
     const { oldpassword, newpassword } = req.body;
 
     if (!oldpassword || !newpassword) {
-      return res.status(201).json({ message: "Please fill all the fields..." });
+      return res.status(404).json({ message: "Please fill all the fields..." });
     }
 
     const passCorrect = await bcrypt.compare(oldpassword, req.user.password);
 
     if (!passCorrect) {
-      return res.status(201).json({ message: "Invalid User..." });
+      return res.status(404).json({ message: "Invalid User..." });
     }
 
     const rounds = await bcrypt.genSalt(10);
@@ -177,7 +182,7 @@ const updateUserPasswordController = async (req, res, next) => {
     });
 
     if (!user) {
-      return res.status(201).json({ message: "Invalid User..." });
+      return res.status(404).json({ message: "Invalid User..." });
     }
 
     return res.status(200).json({ message: "Password updated Successfully." });
@@ -191,7 +196,7 @@ const createUserInfoController = async (req, res, next) => {
     const { country, zipcode, city, address, phone } = req.body;
 
     if (!country || !zipcode || !city || !address || !phone) {
-      return res.status(201).json({ message: "Please fill all the fields..." });
+      return res.status(404).json({ message: "Please fill all the fields..." });
     }
 
     const user = await UserInfo.create({
@@ -204,7 +209,7 @@ const createUserInfoController = async (req, res, next) => {
     });
 
     if (!user) {
-      return res.status(201).json({ message: "Invalid User..." });
+      return res.status(404).json({ message: "Invalid User..." });
     }
 
     return res.status(200).json({ message: "Address added Successfully." });
@@ -219,13 +224,13 @@ const updateUserInfoController = async (req, res, next) => {
     const id = req.params.id;
 
     if (!id) {
-      return res.status(201).json({ message: "Invalid User..." });
+      return res.status(404).json({ message: "Invalid User..." });
     }
 
     const info = await UserInfo.findById(id);
 
     if (!info) {
-      return res.status(201).json({ message: "Invalid User..." });
+      return res.status(404).json({ message: "Invalid User..." });
     }
 
     const user = await UserInfo.findByIdAndUpdate(id, {
@@ -237,7 +242,7 @@ const updateUserInfoController = async (req, res, next) => {
     });
 
     if (!user) {
-      return res.status(201).json({ message: "Invalid User..." });
+      return res.status(404).json({ message: "Invalid User..." });
     }
 
     return res.status(200).json({ message: "Address Updated Successfully." });
@@ -251,13 +256,13 @@ const deleteUserInfoController = async (req, res, next) => {
     const id = req.params.id;
 
     if (!id) {
-      return res.status(201).json({ message: "Invalid User..." });
+      return res.status(404).json({ message: "Invalid User..." });
     }
 
     const user = await UserInfo.findByIdAndDelete(id);
 
     if (!user) {
-      return res.status(201).json({ message: "Invalid User..." });
+      return res.status(404).json({ message: "Invalid User..." });
     }
 
     return res.status(200).json({ message: "Address Deleted Successfully." });
@@ -284,28 +289,14 @@ const getUserInfoController = async (req, res, next) => {
 
 const createUserOrderController = async (req, res, next) => {
   try {
-    const {
-      name,
-      username,
-      phone,
-      address,
-      warranty,
-      shippingFee,
-      price,
-      color,
-      size,
-      discountPrice,
-      category,
-      image,
-      returns,
-      quantity,
-    } = req.body;
-    // const file = req.file;
-    const id = req.params.id;
+    const allData = req.body;
+
+    if (!allData) {
+      return res.status(404).json({ message: "Please fill all the fields..." });
+    }
 
     const uuid = uuidv4();
     const numericUuid = uuid.replace("/-/g", "");
-    console.log(numericUuid);
 
     const today = new Date();
     const tenDaysLater = new Date(today);
@@ -315,34 +306,40 @@ const createUserOrderController = async (req, res, next) => {
       day: "2-digit",
     });
 
-    // const image = await UploadFile(file.path);
+    const orderIDs = await Promise.all(
+      allData.orders.map(async (order) => {
+        const result = await Order.create({
+          name: order.name,
+          color: order.color,
+          country: allData.userdata.country,
+          city: allData.userdata.city,
+          zipCode: allData.userdata.zipcode,
+          address: allData.userdata.address,
+          deliveryDate: monthAndDate,
+          image: order.image,
+          phone: allData.userdata.phone,
+          price: order.price,
+          product: order.productId,
+          quantity: order.quantity,
+          shippingFee: order.deliveryPrice,
+          size: order.size,
+          orderId: numericUuid,
+          username: allData.userdata.username,
+          category: order.category,
+          returns: order.guarantee,
+          discountPrice: order.discount,
+          user: req.user._id,
+          paymentType: allData.paymentType,
+          totalDiscount: order.totalDiscount,
+        });
 
-    const order = await Order.create({
-      name,
-      color,
-      address,
-      deliveryDate: monthAndDate,
-      image,
-      phone,
-      price,
-      product: id,
-      quantity,
-      shippingFee,
-      size,
-      orderId: numericUuid,
-      username,
-      category,
-      returns,
-      discountPrice,
-      user: req.user._id,
-      warranty,
-    });
+        return result;
+      })
+    );
 
-    if (!order) {
-      return res.status(404).json({ message: "Invalid error...." });
-    }
-
-    return res.status(200).json({ message: "Order created successfully..." });
+    return res
+      .status(200)
+      .json({ message: "Order created successfully...", ids: orderIDs });
   } catch (error) {
     next(error);
   }
@@ -364,6 +361,57 @@ const getUserOrdersController = async (req, res, next) => {
   }
 };
 
+const updateOrderController = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const { orderStatus, paymentStatus, paymentType, shipping_fee } = req.body;
+
+    if (!id) {
+      return res.status(404).json({ message: "Invalid order id..." });
+    }
+
+    const oldOrder = await Order.findById(id);
+    const newShippingFee = oldOrder.shippingFee + shipping_fee;
+
+    const order = await Order.findByIdAndUpdate(id, {
+      status: orderStatus,
+      paymentStatus,
+      paymentType,
+      shippingFee: newShippingFee,
+    });
+
+    if (!order) {
+      return res.status(404).json({ message: "Invalid order id..." });
+    }
+
+    return res.status(200).json({ message: "Order updated successfully..." });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getSingleOrderController = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+
+    if (!id) {
+      return res.status(404).json({ message: "Invalid Id..." });
+    }
+
+    const order = await Order.findById(id);
+
+    if (!order) {
+      return res.status(404).json({ message: "invalid order...." });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Order find successfully...", order });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export {
   SignUpController,
   LoginController,
@@ -377,4 +425,6 @@ export {
   updateUserInfoController,
   updateUserPasswordController,
   getUserOrdersController,
+  updateOrderController,
+  getSingleOrderController,
 };

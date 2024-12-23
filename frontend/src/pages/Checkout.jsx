@@ -1,8 +1,66 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { CheckoutCart } from '../components/index.js'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import { ClearData, DeleteOrderData, orderData } from '../store/slices/orderSlices/PendingOrderSlice.jsx'
+import { CreateOrder } from '../store/slices/orderSlices/CreateOrderSlice.jsx'
 
 function Checkout() {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const [totalPrice, settotalPrice] = useState(0)
+  const [totalShippingFee, settotalShippingFee] = useState(0)
+  const [subItemsPrice, setsubItemsPrice] = useState(0)
+  const { orders } = useSelector((state) => state.pendingorder)
+
+  useEffect(() => {
+    let totalShipping = 0
+    let subItems = 0
+    let discount = 0
+    orders.forEach((order, i) => {
+      discount = order.totalDiscount;
+      totalShipping += order.deliveryPrice;
+      subItems += order.price;
+    })
+    let total = subItems + totalShipping;
+    settotalShippingFee(totalShipping)
+    setsubItemsPrice(subItems)
+    settotalPrice(total)
+  }, [orders])
+
+  const deleteHandler = (id) => {
+    dispatch(DeleteOrderData(id))
+  }
+
+  const orderHandler = async () => {
+    const data = {
+      orders,
+      userdata: {
+        username: "tayyeb",
+        phone: "3368212215",
+        address: "new york",
+        country: "united states",
+        city: "new york",
+        zipCode: "12345",
+      }
+    }
+    await dispatch(CreateOrder(data))
+      .then(async (res) => {
+        if (res.type === "createorder/fulfilled") {
+          
+          await dispatch(ClearData());
+          await dispatch(orderData(res.payload.ids));
+          
+
+          navigate('/payment/1234');
+        }
+      }).catch((err) => {
+        console.log(err)
+      })
+  }
+
+
+
   return (
     <>
       <div className="w-full py-4">
@@ -35,8 +93,9 @@ function Checkout() {
               </div>
             </div>
             <div className="carts flex flex-col gap-3 mt-3">
-              <CheckoutCart />
-              <CheckoutCart />
+              {orders && orders.map((data, i) => {
+                return <CheckoutCart key={i} data={data} deleteHandler={deleteHandler} />
+              })}
             </div>
           </div>
           <div className="right w-full md:w-[40%] lg:w-[30%] flex-shrink-0 h-[390px] bg-white py-3 px-3">
@@ -54,23 +113,23 @@ function Checkout() {
             <div className='mt-3'>
               <h2 className='font-semibold text-lg'>Order Summary</h2>
               <div className="flex items-center justify-between mt-2">
-                <h3 className='text-gray-500'>Items Total (3 items)</h3>
-                <h3>Rs. 0</h3>
+                <h3 className='text-gray-500'>Items Total ({orders.length} items)</h3>
+                <h3>Rs. {subItemsPrice}</h3>
               </div>
               <div className="flex items-center justify-between mt-2">
                 <h3 className='text-gray-500'>Delivery Fee</h3>
-                <h3>Rs. 0</h3>
+                <h3>Rs. {totalShippingFee}</h3>
               </div>
             </div>
 
             <div className="total mt-6 flex items-center justify-between">
               <h2>Total:</h2>
-              <h2 className='text-lg text-site-color font-semibold'>Rs. 456</h2>
+              <h2 className='text-lg text-site-color font-semibold'>Rs. {totalPrice}</h2>
             </div>
             <div className="submit-btn mt-6">
-              <Link to={"/payment"}>
-              <button className='py-2 px-4 w-full bg-site-color hover:bg-orange-600 text-white font-semibold'>Proceed to Pay</button>
-              </Link>
+
+              <button onClick={orderHandler} className='py-2 px-4 w-full bg-site-color hover:bg-orange-600 text-white font-semibold'>Proceed to Pay</button>
+
             </div>
           </div>
         </div>

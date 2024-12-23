@@ -1,10 +1,46 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
+import 'react-toastify/dist/ReactToastify.css';
 import './index.css'
-import { RouterProvider, createBrowserRouter } from 'react-router-dom'
-import { Home, Profile, SingleProduct, Cart, Checkout, Login, Signup, Shop, Payment, ManageAccount, Address, Favorits, Orders, Returns, Reviews, UserProfile, OrderDetails } from './pages/index.js'
-import { Admin_home, Admin_Coupons, Admin_Home, Update_user, Admin_Orders, Admin_Products, Admin_Settings, Admin_Users, Admin_Contacts } from './admin_pages/index.js'
+import {
+  RouterProvider,
+  createBrowserRouter
+} from 'react-router-dom'
+import { store } from './store/Store.jsx'
+import { ToastContainer } from 'react-toastify'
+import { Provider } from 'react-redux'
+import {
+  Home,
+  Profile,
+  SingleProduct,
+  Cart,
+  Checkout,
+  Login,
+  Signup,
+  Shop,
+  Payment,
+  ManageAccount,
+  Address,
+  Favorits,
+  Orders,
+  Returns,
+  Reviews,
+  UserProfile,
+  OrderDetails
+} from './pages/index.js'
+import {
+  Admin_home,
+  Admin_Coupons,
+  Admin_Home,
+  Update_user,
+  Admin_Orders,
+  Admin_Products,
+  Admin_Settings,
+  Admin_Users,
+  Admin_Contacts,
+  Update_products,
+  Create_products
+} from './admin_pages/index.js'
 
 const router = createBrowserRouter(
   [
@@ -81,7 +117,7 @@ const router = createBrowserRouter(
         },
         {
           element: <Payment />,
-          path: "/payment"
+          path: "/payment/:id"
         },
       ]
     }, {
@@ -109,6 +145,14 @@ const router = createBrowserRouter(
           path: "update-user"
         },
         {
+          element: <Update_products />,
+          path: "update-product"
+        },
+        {
+          element: <Create_products />,
+          path: "create-product"
+        },
+        {
           element: <Admin_Products />,
           path: "products"
         },
@@ -126,7 +170,10 @@ const router = createBrowserRouter(
 )
 
 createRoot(document.getElementById('root')).render(
-  <RouterProvider router={router}>
-    <App />
-  </RouterProvider>
+  <Provider store={store}>
+    <ToastContainer autoClose={3000} />
+    <RouterProvider router={router}>
+      <App />
+    </RouterProvider>
+  </Provider>
 )

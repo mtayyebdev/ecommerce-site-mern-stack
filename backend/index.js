@@ -1,9 +1,9 @@
 import express, { json } from "express";
 import "dotenv/config";
 import cors from "cors";
-import ConnectDB from "./src/config/mongodb.connection";
+import ConnectDB from "./src/config/mongodb.connection.js";
 import cookieParser from "cookie-parser";
-import Coupon from "./src/models/coupon.model";
+import Coupon from "./src/models/coupon.model.js";
 import cron from "node-cron";
 import ErrorHandling from "./src/middlewares/errorHandling.middleware.js";
 
@@ -12,19 +12,19 @@ import AuthRouter from "./src/routers/auth.route.js";
 import CartRouter from "./src/routers/cart.route.js";
 import ProductRouter from "./src/routers/products.route.js";
 import CouponRouter from "./src/routers/coupon.route.js";
-import AdminRouter from "./src/routers/admin.route.js";
+// import AdminRouter from "./src/routers/admin.route.js";
 
 const app = express();
 
 app.use(
   cors({
-    origin: ["*"],
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
 ConnectDB();
-app.use(json());
 app.use(cookieParser());
+app.use(json());
 
 cron.schedule("0 0 * * *", async () => {
   // Run this job daily at midnight
@@ -44,7 +44,7 @@ app.use("/api/auth", AuthRouter);
 app.use("/api/cart", CartRouter);
 app.use("/api/product", ProductRouter);
 app.use("/api/coupon", CouponRouter);
-app.use("/api/admin", AdminRouter);
+// app.use("/api/admin", AdminRouter);
 
 app.use(ErrorHandling);
 

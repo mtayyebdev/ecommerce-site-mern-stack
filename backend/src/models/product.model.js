@@ -15,11 +15,11 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
     price: {
-      type: String,
+      type: Number,
       required: true,
     },
     discountPrice: {
-      type: String,
+      type: Number,
       required: true,
     },
     frontImage: {
@@ -47,7 +47,7 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
     deliveryPrice: {
-      type: String,
+      type: Number,
       required: true,
     },
     reviews: {

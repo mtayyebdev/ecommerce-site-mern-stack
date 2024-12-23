@@ -1,7 +1,37 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from 'react-redux'
+import { LogIn } from '../store/slices/userSlices/LoginSlice'
+import {UserData} from '../store/slices/userSlices/UserdataSlice'
+import {GetCart} from '../store/slices/cartSlices/GetCartSlice.jsx'
 
 function Login() {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const { loader } = useSelector((state) => state.login)
+  const [phone, setphone] = useState("")
+  const [password, setpassword] = useState("")
+
+  const loginHandler = () => {
+    const data = {
+      phone: phone,
+      password: password
+    }
+
+    dispatch(LogIn(data))
+      .then((res) => {
+        if (res.type === "login/fulfilled") {
+          setphone("")
+          setpassword("")
+          navigate("/")
+          dispatch(UserData())
+          dispatch(GetCart())
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  }
   return (
     <>
       <div className="w-full">
@@ -23,7 +53,7 @@ function Login() {
           <div className="bg-white w-full">
             <div className="mx-auto w-full sm:w-[90%] md:w-[70%] py-8 px-3">
               <h2 className="font-semibold">Login with Password</h2>
-              <form className="mt-3 text-base">
+              <div className="mt-3 text-base">
                 <div>
                   <div className="py-1 text-sm font-semibold">
                     <label htmlFor="phone">Phone Number*</label>
@@ -32,6 +62,8 @@ function Login() {
                     <input
                       type="text"
                       name="phone"
+                      value={phone}
+                      onChange={(e) => setphone(e.target.value)}
                       id="phone"
                       placeholder="Please enter your phone number..."
                       className="outline-none w-full py-2 px-2 border border-gray-300"
@@ -55,6 +87,8 @@ function Login() {
                     <input
                       type="text"
                       name="password"
+                      value={password}
+                      onChange={(e) => setpassword(e.target.value)}
                       id="password"
                       placeholder="Please enter your password"
                       className="outline-none w-full py-2 px-2 border border-gray-300"
@@ -67,11 +101,12 @@ function Login() {
                 </div>
                 <button
                   type="submit"
+                  onClick={loginHandler}
                   className="text-white bg-site-color hover:bg-orange-500 py-2 w-full text-base mt-6"
                 >
-                  Login
+                  {loader ? "Loading..." : "Login"}
                 </button>
-              </form>
+              </div>
               <div className="flex items-center mt-5 w-full">
                 <hr className="w-full" />
                 <p className="whitespace-nowrap text-gray-500 text-sm">

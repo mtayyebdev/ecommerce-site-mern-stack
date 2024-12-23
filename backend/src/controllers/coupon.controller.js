@@ -3,6 +3,7 @@ import Coupon from "../models/coupon.model.js";
 const getCouponController = async (req, res, next) => {
   try {
     const { code } = req.body;
+    
     const coupons = await Coupon.findOne({ code });
 
     if (!coupons) {

@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from "react";
-// import { useParams } from "next/navigation";
 // import axios from "axios";
-// import { useRouter } from "next/navigation";
-// import { useStore } from "@/src/store/store";
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 // import { toast } from "react-toastify";
 
 function Update_user() {
-    //   const router = useRouter();
-    //   const { id } = useParams();
-    //   const {getAllData}=useStore()
+    const { id } = useParams();
     const [loader, setloader] = useState(false)
     const [eye, seteye] = useState(false)
     const [username, setusername] = useState("");
+    const [gender, setgender] = useState("")
+    const [phone, setphone] = useState("")
+    const [birthday, setbirthday] = useState("")
     const [email, setemail] = useState("");
     const [admin, setadmin] = useState(false);
-    // const [verified, setverified] = useState(false);
+    const [avatar, setAvatar] = useState(null)
     const [password, setpassword] = useState("");
 
 
@@ -39,33 +37,25 @@ function Update_user() {
     //   }, []);
 
 
-    //   const updateUser = async () => {
-    //     try {
-    //       if (!username || !email || !admin || !verified || !password) {
-    //         return toast.error("Please fill all fields...");
-    //       }
-    //       setloader(true)
-    //       const res = await axios.patch(`/api/admin/user/updateuser/${id}`, {
-    //         username,
-    //         email,
-    //         admin,
-    //         verified,
-    //         password,
-    //       });
-    //       if (res.status == 200) {
-    //         toast.success(res.data.message);
-    //         router.push("/web-admin/users");
-    //         getAllData()
-    //       } else if (res.data) {
-    //         toast.error(res.data.message);
-    //       } else {
-    //         console.log(res);
-    //       }
-    //       setloader(false)
-    //     } catch (error) {
-    //       console.log("User updating error: ", error);
-    //     }
-    //   };
+    const updateUser = async () => {
+        try {
+            setloader(true)
+            const formdata = new FormData()
+            formdata.append("avatar", avatar)
+            formdata.append("email", email)
+            formdata.append("password", password)
+            formdata.append("admin", admin)
+            formdata.append("gender", gender)
+            formdata.append("phone", phone)
+            formdata.append("birthday", birthday)
+
+            console.log(formdata);
+
+        } catch (error) {
+            console.log("User updating error: ", error);
+        }
+        setloader(false)
+    };
 
     return (
         <>
@@ -75,6 +65,12 @@ function Update_user() {
                     <div className=' w-[10rem] h-0.5 mt-1 bg-blue-600'></div>
                 </div>
                 <div className="space-y-6 mt-5">
+                    <div className="img flex items-center justify-center py-4">
+                        <label htmlFor="img">
+                            <img src={avatar ? URL.createObjectURL(avatar) : "/sliderimg/p4.webp"} className="rounded-full w-[200px] object-cover h-[200px]" alt="user img" />
+                        </label>
+                        <input type="file" name="img" onChange={(e) => setAvatar(e.target.files[0])} className="hidden" id="img" />
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
                             <label className="text-gray-800 text-sm mb-2 block">
@@ -118,8 +114,8 @@ function Update_user() {
                                 name="phone"
                                 type="number"
                                 id="phone"
-                                value={email}
-                                onChange={(e) => setemail(e.target.value)}
+                                value={phone}
+                                onChange={(e) => setphone(e.target.value)}
                                 required
                                 className=" bg-white border border-gray-300 w-full text-sm px-4 py-2.5 rounded-md outline-blue-500"
                                 placeholder="Enter Phone Number"
@@ -179,7 +175,7 @@ function Update_user() {
                             </label>
                             <select
                                 name="gender"
-                                onChange={(e) => setadmin(e.target.value)}
+                                onChange={(e) => setgender(e.target.value)}
                                 id="gender"
                                 className=" bg-white border border-gray-300 w-full text-sm px-4 py-2.5 rounded-md outline-blue-500"
                             >
@@ -196,24 +192,14 @@ function Update_user() {
                             >
                                 Birth Day
                             </label>
-                            {/* <select
-                                name="birth"
-                                onChange={(e) => setadmin(e.target.value)}
-                                id="birth"
-                                className=" bg-white border border-gray-300 w-full text-sm px-4 py-2.5 rounded-md outline-blue-500"
-                            >
-                                <option className="text-black">Select......</option>
-                                <option value={false} className="text-black">False</option>
-                                <option value={true} className="text-black">True</option>
-                            </select> */}
-                            <input type="date" name="birth" required
+                            <input type="date" onChange={(e)=>setbirthday(e.target.value)} name="birth" required
                                 className=" bg-white border border-gray-300 w-full text-sm px-4 py-2.5 rounded-md outline-blue-500" id="birth" />
                         </div>
                     </div>
                 </div>
                 <div className="!mt-12">
                     <button
-                        // onClick={updateUser}
+                        onClick={updateUser}
                         type="submit"
                         className="w-full py-3 px-4 tracking-wider text-sm rounded-md text-white bg-blue-600 hover:bg-blue-800 focus:outline-none"
                     >

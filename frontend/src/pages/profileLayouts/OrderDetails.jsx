@@ -13,31 +13,31 @@ function OrderDetails() {
                             Cancelled
                         </h2>
                     </div>
-                    <div class="flex flex-col justify-between md:flex-row p-6 w-full">
-                        <div class="flex items-start space-x-4 w-full md:w-3/4">
-                            <div class="overflow-hidden">
+                    <div className="flex flex-col justify-between md:flex-row p-6 w-full">
+                        <div className="flex items-start space-x-4 w-full md:w-3/4">
+                            <div className="overflow-hidden">
                                 <img
                                     src="/sliderimg/p2.webp"
                                     alt="Product Image"
-                                    class="w-[100px] h-[100px]"
+                                    className="w-[100px] h-[100px]"
                                 />
                             </div>
                             <div className="w-1/2">
-                                <h2 class="text-sm">
+                                <h2 className="text-sm">
                                     Blusher And Highlighter kit- 3in1 pallate Professional Makeup
                                     kit for Eyes and Cheeks
                                 </h2>
-                                <p class="text-sm text-gray-500 mt-1">
-                                    Shade: <span class="font-medium">Random number</span>
+                                <p className="text-sm text-gray-500 mt-1">
+                                    Shade: <span className="font-medium">Random number</span>
                                 </p>
                                 <p className="text-xs mt-1">Cancelled</p>
                             </div>
                             <div>
-                                <p class="font-semibold text-gray-800">Rs. 327</p>
+                                <p className="font-semibold text-gray-800">Rs. 327</p>
                             </div>
                         </div>
-                        <div class="text-right w-full mt-3 md:mt-0 md:w-1/4 flex items-start">
-                            <p class="text-sm text-gray-500">Qty: 1</p>
+                        <div className="text-right w-full mt-3 md:mt-0 md:w-1/4 flex items-start">
+                            <p className="text-sm text-gray-500">Qty: 1</p>
                         </div>
                     </div>
                 </div>

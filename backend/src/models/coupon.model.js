@@ -7,17 +7,18 @@ const couponSchema = new mongoose.Schema(
       required: true,
     },
     discount: {
-      type: String,
+      type: Number,
       required: true,
     },
     expire: {
       type: Date,
-      required: true,
-      index: { expireAfterSeconds: 1728000 } // 20 days in seconds
+      required: true
     }
   },
   { timestamps: true }
 );
+
+couponSchema.index({expire: 1}, {expireAfterSeconds: 0})
 
 const Coupon = mongoose.model("Coupon", couponSchema);
 export default Coupon;

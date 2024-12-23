@@ -1,10 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import {Comment} from "../components/index.js";
+import { Comment } from "../components/index.js";
+import { useDispatch, useSelector } from 'react-redux'
+import { GetSingleProduct } from '../store/slices/productSlices/GetSingleProductSlice.jsx'
+import { CreateCart } from '../store/slices/cartSlices/CreateCartSlice.jsx'
+import {GetCart} from '../store/slices/cartSlices/GetCartSlice.jsx'
 
 function SingleProduct() {
+  const dispatch = useDispatch()
+  const { product } = useSelector((state) => state.getsingleproduct)
   const { id } = useParams();
   const [quantity, setquantity] = useState(1);
+
+
+  useEffect(() => {
+    dispatch(GetSingleProduct(id))
+  }, [id])
+
+  const addToCartHandler = async() => {
+    await dispatch(CreateCart({ quantity, id }))
+    await dispatch(GetCart())
+  }
+
+
+
 
   return (
     <>
@@ -14,40 +33,38 @@ function SingleProduct() {
             <div className="left w-full md:w-[40%]">
               <div className="img w-full h-[300px]">
                 <img
-                  src="/sliderimg/p1.webp"
+                  src={product && product.data.frontImage}
                   className="w-full h-full"
                   alt="product"
                 />
               </div>
               <div className="flex items-center gap-2 w-full flex-wrap mt-2">
                 <img
-                  src="/sliderimg/p1.webp"
+                  src={product && product.data.image1}
                   className="w-[80px] h-[80px]"
                   alt="image1"
                 />
                 <img
-                  src="/sliderimg/p1.webp"
+                  src={product && product.data.image2}
                   className="w-[80px] h-[80px]"
                   alt="image1"
                 />
                 <img
-                  src="/sliderimg/p1.webp"
+                  src={product && product.data.image3}
                   className="w-[80px] h-[80px]"
                   alt="image1"
                 />
-                <img
+                {/* <img
                   src="/sliderimg/p1.webp"
                   className="w-[80px] h-[80px]"
                   alt="image1"
-                />
+                /> */}
               </div>
             </div>
             <div className="right w-full md:w-[60%] px-0 md:px-4">
               <div className="title">
                 <h2 className="text-xl my-2">
-                  OKS® New T900 Ultra 2 Smartwatch Bluetooth Call Sleeping
-                  Monitoring Smart Watch Series 8 2.09" Full Touch Watch for Men
-                  Women
+                  {product && product.data.name}
                 </h2>
               </div>
               <div className="ratings flex items-center justify-between mt-4">
@@ -60,7 +77,7 @@ function SingleProduct() {
                     <i className="fa-solid fa-star-half text-yellow-400"></i>
                   </div>
                   <h3 className="text-xs text-blue-500 ms-1 hover:underline cursor-pointer">
-                    40 Ratings
+                    {product && product.data.reviews.total} Ratings
                   </h3>
                 </div>
                 <div className="share flex items-center text-lg gap-2 text-[rgb(158,158,158)]">
@@ -89,10 +106,10 @@ function SingleProduct() {
               <hr className="mt-4" />
               <div className="price mt-3">
                 <div>
-                  <h2 className="text-3xl text-site-color">Rs. 485</h2>
+                  <h2 className="text-3xl text-site-color">Rs. {product && product.data.price}</h2>
                 </div>
                 <div className="discount text-sm flex items-center gap-1">
-                  <h2 className="line-through">Rs. 9654</h2>
+                  <h2 className="line-through">Rs. {product && product.data.discountPrice}</h2>
                   <h2>-40%</h2>
                 </div>
               </div>
@@ -101,20 +118,20 @@ function SingleProduct() {
                   <h2>Color Family:</h2>
                 </div>
                 <div className="color-value ms-2">
-                  <h2 className="text-sm">Black</h2>
+                  <h2 className="text-sm">{product && product.data.color}</h2>
                   <div className="flex items-center flex-row flex-wrap gap-1">
                     <img
-                      src="/sliderimg/p1.webp"
+                      src={product && product.data.image1}
                       className="w-[40px] h-[40px]"
                       alt="image1"
                     />
                     <img
-                      src="/sliderimg/p1.webp"
+                      src={product && product.data.image2}
                       className="w-[40px] h-[40px]"
                       alt="image1"
                     />
                     <img
-                      src="/sliderimg/p1.webp"
+                      src={product && product.data.image3}
                       className="w-[40px] h-[40px]"
                       alt="image1"
                     />
@@ -125,18 +142,16 @@ function SingleProduct() {
                 <h2 className="text-sm text-gray-600">Quantity:</h2>
                 <div className="flex items-center ms-8 gap-5 text-lg">
                   <button
-                    className={`py-1 px-3 bg-gray-200 ${
-                      quantity == 1 ? "text-white bg-gray-300" : ""
-                    } text-xl font-bold hover:text-white hover:bg-gray-300`}
+                    className={`py-1 px-3 bg-gray-200 ${quantity == 1 ? "text-white bg-gray-300" : ""
+                      } text-xl font-bold hover:text-white hover:bg-gray-300`}
                     onClick={() => setquantity(quantity > 1 ? quantity - 1 : 1)}
                   >
                     -
                   </button>
                   <h2>{quantity}</h2>
                   <button
-                    className={`py-1 px-3 bg-gray-200 ${
-                      quantity == 4 ? "text-white bg-gray-300" : ""
-                    } text-xl font-bold hover:text-white hover:bg-gray-300`}
+                    className={`py-1 px-3 bg-gray-200 ${quantity == 4 ? "text-white bg-gray-300" : ""
+                      } text-xl font-bold hover:text-white hover:bg-gray-300`}
                     onClick={() =>
                       setquantity(quantity >= 4 ? 4 : quantity + 1)
                     }
@@ -149,7 +164,7 @@ function SingleProduct() {
                 <button className="w-full bg-[rgb(42,187,232)] py-2 text-white hover:bg-[rgb(29,165,206)] font-semibold">
                   Buy Now
                 </button>
-                <button className="w-full hover:bg-[rgb(228,94,27)] bg-site-color py-2 text-white font-semibold">
+                <button className="w-full hover:bg-[rgb(228,94,27)] bg-site-color py-2 text-white font-semibold" onClick={addToCartHandler}>
                   Add to Cart
                 </button>
               </div>
@@ -180,11 +195,11 @@ function SingleProduct() {
                   <div>
                     <h2 className="text-sm">Standard Delivery</h2>
                     <p className="text-xs text-gray-400">
-                      Guaranteed by 10-17 Oct
+                      Guaranteed {product && product.data.return}
                     </p>
                   </div>
                 </div>
-                <h3>Rs. 177</h3>
+                <h3>Rs. {product && product.data.deliveryPrice}</h3>
               </div>
               <div className="flex items-center flex-row mt-3 gap-4">
                 <i className="fa-solid fa-sack-dollar text-xl text-gray-400"></i>
@@ -199,11 +214,11 @@ function SingleProduct() {
               </div>
               <div className="flex items-center flex-row mt-3 gap-4">
                 <i className="fa-solid fa-arrow-rotate-left text-xl text-gray-400"></i>
-                <h2 className="text-sm">14 days easy return</h2>
+                <h2 className="text-sm">Return {product && product.data.return}</h2>
               </div>
               <div className="flex items-center flex-row mt-3 gap-4">
                 <i className="fa-regular fa-circle-xmark text-xl text-gray-400"></i>
-                <h2 className="text-sm">Warranty not available</h2>
+                <h2 className="text-sm">Warranty {product && product.data.warranty}</h2>
               </div>
             </div>
             <div className="bg-white h-2 w-full"></div>
@@ -220,10 +235,7 @@ function SingleProduct() {
                 Product Short Description
               </h2>
               <p>
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Sed
-                natus molestiae esse cum! At sapiente tempore rerum cumque
-                placeat minus autem. Totam ipsum unde sunt, iste excepturi
-                similique delectus illum!
+                {product && product.data.shortDescription}
               </p>
             </div>
             <div>
@@ -231,36 +243,13 @@ function SingleProduct() {
                 Product Long Description
               </h2>
               <p>
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Sed
-                natus molestiae esse cum! At sapiente tempore rerum cumque
-                placeat minus autem. Totam ipsum unde sunt, iste excepturi
-                similique delectus illum! Lorem ipsum dolor sit amet
-                consectetur, adipisicing elit. Sed natus molestiae esse cum! At
-                sapiente tempore rerum cumque placeat minus autem. Totam ipsum
-                unde sunt, iste excepturi similique delectus illum! Lorem ipsum
-                dolor sit amet consectetur, adipisicing elit. Sed natus
-                molestiae esse cum! At sapiente tempore rerum cumque placeat
-                minus autem. Totam ipsum unde sunt, iste excepturi similique
-                delectus illum! Lorem ipsum dolor sit amet consectetur,
-                adipisicing elit. Sed natus molestiae esse cum! At sapiente
-                tempore rerum cumque placeat minus autem. Totam ipsum unde sunt,
-                iste excepturi similique delectus illum! Lorem ipsum dolor sit
-                amet consectetur, adipisicing elit. Sed natus molestiae esse
-                cum! At sapiente tempore rerum cumque placeat minus autem. Totam
-                ipsum unde sunt, iste excepturi similique delectus illum! Lorem
-                ipsum dolor sit amet consectetur, adipisicing elit. Sed natus
-                molestiae esse cum! At sapiente tempore rerum cumque placeat
-                minus autem. Totam ipsum unde sunt, iste excepturi similique
-                delectus illum! Lorem ipsum dolor sit amet consectetur,
-                adipisicing elit. Sed natus molestiae esse cum! At sapiente
-                tempore rerum cumque placeat minus autem. Totam ipsum unde sunt,
-                iste excepturi similique delectus illum!
+                {product && product.data.longDescription}
               </p>
             </div>
           </div>
         </section>
         <section className="reviews bg-white text-black mt-2">
-            <h2 className="text-lg px-4 font-semibold py-2 line-clamp-1 bg-[rgb(250,250,250)]">Ratings & Reviews of </h2>
+          <h2 className="text-lg px-4 font-semibold py-2 line-clamp-1 bg-[rgb(250,250,250)]">Ratings & Reviews of </h2>
           <div className="p-4">
             <div className="review">
               <div className="flex items-center mt-2">
@@ -270,27 +259,20 @@ function SingleProduct() {
                 <i className="fa-solid fa-star text-yellow-400"></i>
                 <i className="fa-solid fa-star-half text-yellow-400"></i>
                 <h3 className="text-blue-600 hover:underline cursor-pointer">
-                  Ratings (56)
+                  Ratings ({product && product.data.reviews.total})
                 </h3>
               </div>
             </div>
           </div>
-            <hr className="mt-2" />
-            <h2 className="text-lg font-semibold my-2 px-4">Product Reviews</h2>
+          <hr className="mt-2" />
+          <h2 className="text-lg font-semibold my-2 px-4">Product Reviews</h2>
           <hr />
           <div className="flex flex-col pt-1">
-            <Comment/>
-            <hr />
-            <Comment/>
-            <hr />
-            <Comment/>
-            <hr />
-            <Comment/>
-            <hr />
-            <Comment/>
-            <hr />
-            <Comment/>
-            <hr />
+            {
+              product && product.data.reviews.comment.map((data, index) => (
+                <Comment key={index} review={review} />
+              ))
+            }
           </div>
         </section>
       </div>
