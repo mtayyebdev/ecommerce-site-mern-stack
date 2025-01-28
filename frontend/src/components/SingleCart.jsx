@@ -4,7 +4,7 @@ import { DeleteCart } from '../store/slices/cartSlices/DeleteCartSlice.jsx'
 import { GetCart } from '../store/slices/cartSlices/GetCartSlice.jsx'
 import { UpdateCart } from '../store/slices/cartSlices/UpdateCartSlice.jsx'
 
-function SingleCart({ image, name, color, price, discountPrice, checkedHandler, quantity, id }) {
+function SingleCart({ image, name, color, price, discountPrice, checkedHandler,isSelected, quantity, id }) {
     const dispatch = useDispatch()
     const [quantitynew, setquantitynew] = useState(quantity);
 
@@ -21,13 +21,14 @@ function SingleCart({ image, name, color, price, discountPrice, checkedHandler, 
         await dispatch(UpdateCart(data))
         await dispatch(GetCart())
     }
+    
 
 
     return (
         <>
             <div className="flex flex-col lg:flex-row bg-white text-black gap-3 justify-between py-[10px] px-3">
                 <div className='flex flex-row gap-3'>
-                    <input type="checkbox" name="box" id="box" onChange={(e) => checkedHandler(e, id)} />
+                    <input type="checkbox" checked={isSelected} name="box" id="box" onChange={(e) => checkedHandler(e, id)} />
                     <img src={image} alt="img" className='w-[60px] h-[60px] sm:w-[100px] sm:h-[100px] rounded' />
                     <div className='w-auto xl:w-[400px]'>
                         <h2 className='product-name text-sm'>{name}</h2>

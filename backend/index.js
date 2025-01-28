@@ -1,11 +1,11 @@
-import express, { json } from "express";
+import express, { json, urlencoded } from "express";
 import "dotenv/config";
 import cors from "cors";
 import ConnectDB from "./src/config/mongodb.connection.js";
 import cookieParser from "cookie-parser";
 import Coupon from "./src/models/coupon.model.js";
 import cron from "node-cron";
-import ErrorHandling from "./src/middlewares/errorHandling.middleware.js";
+import ErrorHandling from "./src/utils/errorHandling.middleware.js";
 
 // routers.............................................
 import AuthRouter from "./src/routers/auth.route.js";
@@ -15,6 +15,7 @@ import CouponRouter from "./src/routers/coupon.route.js";
 // import AdminRouter from "./src/routers/admin.route.js";
 
 const app = express();
+ConnectDB();
 
 app.use(
   cors({
@@ -22,9 +23,9 @@ app.use(
     credentials: true,
   })
 );
-ConnectDB();
 app.use(cookieParser());
-app.use(json());
+app.use(json({ limit: "16kb" }));
+app.use(urlencoded({ limit: "16kb" }));
 
 cron.schedule("0 0 * * *", async () => {
   // Run this job daily at midnight

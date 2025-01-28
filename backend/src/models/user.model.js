@@ -14,10 +14,12 @@ const userSchema = new mongoose.Schema(
     phone: {
       type: String,
       required: true,
+      unique: true,
     },
     gender: {
       type: String,
       required: true,
+      default: "Other",
     },
     password: {
       type: String,
@@ -46,6 +48,22 @@ const userSchema = new mongoose.Schema(
     isAdmin: {
       type: Boolean,
       default: false,
+    },
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
+    marketingSMS: {
+      type: Boolean,
+      default: false,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    Balance: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true }

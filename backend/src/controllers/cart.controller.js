@@ -1,128 +1,105 @@
 import Cart from "../models/cart.model.js";
 import Product from "../models/product.model.js";
+import { TryCatchHandler } from "../utils/TryCatchHandler.js";
 
-const createCartController = async (req, res, next) => {
-  try {
-    const {quantity}=req.body;
-    const id = req.params.id;
+const getCartController = TryCatchHandler(async (req, res, next) => {
+  const carts = await Cart.find({ user: req.user._id });
 
-    if (!id) {
-      return res.status(404).json({ message: "Inavlid Path..." });
-    }
-
-    const product = await Product.findById(id);
-
-    if (!product) {
-      return res.status(404).json({ message: "Product not found..." });
-    }
-
-    const totalPrice = quantity * product.price;
-    const totalDeliveryPrice = quantity * product.deliveryPrice;
-
-    const cart = await Cart.create({
-      name: product.name,
-      image: product.frontImage,
-      price: totalPrice,
-      discount: product.discountPrice,
-      deliveryPrice: totalDeliveryPrice,
-      product: product._id,
-      user: req.user._id,
-      color: product.color,
-      size: product.size,
-      category: product.category,
-      guarantee: product.warranty,
-      quantity,
-    });
-
-    if (!cart) {
-      return res.status(404).json({ message: "Error..." });
-    }
-
-    return res.status(200).json({ message: "Cart Added Successfully." });
-  } catch (error) {
-    next(error);
+  if (!carts) {
+    return res.status(404).json({ message: "Not found." });
   }
-};
 
-const getCartController = async (req, res, next) => {
-  try {
-    const carts = await Cart.find({ user: req.user._id });
+  return res.status(200).json({ message: "Carts found.", data: carts });
+});
 
-    if (!carts) {
-      return res.status(404).json({ message: "Not found." });
-    }
+const deleteCartController = TryCatchHandler(async (req, res, next) => {
+  const id = req.params.id;
+  const carts = await Cart.findByIdAndDelete(id);
 
-    return res.status(200).json({ message: "Carts found.", data: carts });
-  } catch (error) {
-    next(error);
+  if (!carts) {
+    return res.status(404).json({ message: "Not found." });
   }
-};
 
-const deleteCartController = async (req, res, next) => {
-  try {
-    const id = req.params.id;
-    const carts = await Cart.findByIdAndDelete(id);
+  return res.status(200).json({ message: "Cart Deleted Successfully." });
+});
 
-    if (!carts) {
-      return res.status(404).json({ message: "Not found." });
-    }
+const deleteAllCartsController = TryCatchHandler(async (req, res, next) => {
+  const carts = await Cart.deleteMany({ user: req.user._id });
 
-    return res.status(200).json({ message: "Cart Deleted Successfully." });
-  } catch (error) {
-    next(error);
+  if (!carts) {
+    return res.status(404).json({ message: "Not found." });
   }
-};
 
-const deleteAllCartsController = async (req, res, next) => {
-  try {
-    const carts = await Cart.deleteMany({user:req.user._id});
-    
-    if (!carts) {
-      return res.status(404).json({ message: "Not found." });
-    }
+  return res.status(200).json({ message: "Carts Deleted Successfully." });
+});
 
-    return res.status(200).json({ message: "Carts Deleted Successfully." });
-  } catch (error) {
-    next(error);
+const updateCartController = TryCatchHandler(async (req, res, next) => {
+  const id = req.params.id;
+  const { quantity } = req.body;
+
+  if (!quantity) {
+    return res.status(404).json({ message: "Quantity not found." });
   }
-};
 
-const updateCartController = async (req, res, next) => {
-  try {
-    const id = req.params.id;
-    const { quantity } = req.body;
-    
-    if (!quantity) {
-      return res.status(404).json({ message: "Qunatity not found." });
-    }
+  const cart = await Cart.findById(id);
 
-    const cart = await Cart.findById(id);  
-    
-    if (!cart) {
-      return res.status(404).json({ message: "Not found." });
-    }
-
-    const findProduct =await Product.findById(cart.product)
-
-    cart.price = quantity * findProduct.price;
-    cart.deliveryPrice = quantity * findProduct.deliveryPrice;
-    cart.quantity = quantity;
-    await cart.save();
-
-    if (!updatedCart) {
-      return res.status(404).json({ message: "Not found." });
-    }
-
-    return res.status(200).json({ message: "Cart Updated Successfully." });
-  } catch (error) {
-    next(error);
+  if (!cart) {
+    return res.status(404).json({ message: "Not found." });
   }
-};
+
+  const findProduct = await Product.findById(cart.product);
+
+  cart.price = quantity * findProduct.price;
+  cart.deliveryPrice = quantity * findProduct.deliveryPrice;
+  cart.quantity = quantity;
+  await cart.save();
+
+  return res.status(200).json({ message: "Cart Updated Successfully." });
+});
+
+const createCartController = TryCatchHandler(async (req, res, next) => {
+  const { quantity } = req.body;
+  const id = req.params.id;
+
+  if (!id) {
+    return res.status(404).json({ message: "Invalid Path..." });
+  }
+
+  const product = await Product.findById(id);
+
+  if (!product) {
+    return res.status(404).json({ message: "Product not found..." });
+  }
+
+  const totalPrice = quantity * product.price;
+  const totalDeliveryPrice = quantity * product.deliveryPrice;
+
+  const cart = await Cart.create({
+    name: product.name,
+    image: product.frontImage,
+    price: totalPrice,
+    discount: product.discountPrice,
+    deliveryPrice: totalDeliveryPrice,
+    product: product._id,
+    user: req.user._id,
+    color: product.color,
+    size: product.size,
+    category: product.category,
+    guarantee: product.warranty,
+    quantity,
+  });
+
+  if (!cart) {
+    return res.status(404).json({ message: "Error..." });
+  }
+
+  return res.status(200).json({ message: "Cart Added Successfully." });
+});
 
 export {
   getCartController,
   createCartController,
   deleteCartController,
   updateCartController,
-  deleteAllCartsController
+  deleteAllCartsController,
 };

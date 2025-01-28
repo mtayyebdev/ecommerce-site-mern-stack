@@ -4,7 +4,7 @@ import { Comment } from "../components/index.js";
 import { useDispatch, useSelector } from 'react-redux'
 import { GetSingleProduct } from '../store/slices/productSlices/GetSingleProductSlice.jsx'
 import { CreateCart } from '../store/slices/cartSlices/CreateCartSlice.jsx'
-import {GetCart} from '../store/slices/cartSlices/GetCartSlice.jsx'
+import { GetCart } from '../store/slices/cartSlices/GetCartSlice.jsx'
 
 function SingleProduct() {
   const dispatch = useDispatch()
@@ -17,7 +17,7 @@ function SingleProduct() {
     dispatch(GetSingleProduct(id))
   }, [id])
 
-  const addToCartHandler = async() => {
+  const addToCartHandler = async () => {
     await dispatch(CreateCart({ quantity, id }))
     await dispatch(GetCart())
   }
@@ -172,24 +172,7 @@ function SingleProduct() {
           </div>
           <div className="right w-full xl:w-[25%] flex flex-wrap bg-[rgb(250,250,250)]">
             <div className="address p-2 w-full">
-              <div className="flex items-center justify-between text-sm text-gray-400">
-                <h3 className="text-sm">Delivery Options </h3>
-                <i className="fa-solid fa-circle-info"></i>
-              </div>
-              <div className="flex flex-row justify-between items-center mt-3">
-                <div className="location flex gap-4">
-                  <i className="fa-solid fa-location-dot text-xl text-gray-400"></i>
-                  <h2 className="text-sm w-2/3">
-                    Khyber Pakhtunkhwa, Swabi, Kalu Khan
-                  </h2>
-                </div>
-                <button className="text-blue-500 text-sm hover:underline">
-                  CHANGE
-                </button>
-              </div>
-              <hr className="mt-2" />
-
-              <div className="flex items-center justify-between flex-row mt-3">
+              <div className="flex items-center justify-between flex-row">
                 <div className="location flex gap-4">
                   <i className="fa-solid fa-truck text-xl text-gray-400"></i>
                   <div>
@@ -207,7 +190,7 @@ function SingleProduct() {
               </div>
               <hr className="mt-2" />
             </div>
-            <div className="warrenty mt-3 p-2 w-full">
+            <div className="warrenty p-2 w-full">
               <div className="flex items-center justify-between text-sm text-gray-400">
                 <h3 className="text-sm">Return & Warranty </h3>
                 <i className="fa-solid fa-circle-info"></i>

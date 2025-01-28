@@ -16,6 +16,9 @@ import {
   updateUserInfoController,
   updateUserPasswordController,
   updateOrderController,
+  CancelOrderController,
+  getSingleUserInfo,
+  updateInfoByShippingController,
 } from "../controllers/auth.controller.js";
 
 const AuthRouter = express.Router();
@@ -29,9 +32,10 @@ AuthRouter.route("/deleteinfo").delete(UserVerify, deleteUserInfoController);
 AuthRouter.route("/getuser").get(UserVerify, getUserController);
 AuthRouter.route("/getinfo").get(UserVerify, getUserInfoController);
 AuthRouter.route("/getorders").get(UserVerify, getUserOrdersController);
+AuthRouter.route("/getorder/:id").get(UserVerify, getSingleOrderController);
+AuthRouter.route("/getsingleinfo/:id").get(UserVerify, getSingleUserInfo);
 AuthRouter.route("/updateuser").patch(
   UserVerify,
-  upload.single("file"),
   updateUserController
 );
 AuthRouter.route("/updateinfo/:id").patch(UserVerify, updateUserInfoController);
@@ -39,7 +43,11 @@ AuthRouter.route("/updatepassword").patch(
   UserVerify,
   updateUserPasswordController
 );
+AuthRouter.route("/updateinfoshipping/:id").patch(
+  UserVerify,
+  updateInfoByShippingController
+);
 AuthRouter.route("/updateorder/:id").patch(UserVerify, updateOrderController);
-AuthRouter.route("/getorder/:id").get(UserVerify, getSingleOrderController);
+AuthRouter.route("/cancelorder/:id").delete(UserVerify, CancelOrderController);
 
 export default AuthRouter;

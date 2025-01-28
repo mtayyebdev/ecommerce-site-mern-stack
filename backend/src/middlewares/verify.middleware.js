@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 
 const UserVerify = async (req, res, next) => {
   try {
-    const token = await req.cookies.token;    
+    const token = await req.cookies.token;
 
     if (!token) {
       return res.status(404).json({ message: "Unauthorized user..." });

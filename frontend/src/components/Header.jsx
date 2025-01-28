@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux'
 import { UserData } from '../store/slices/userSlices/UserdataSlice'
 import { Logout } from '../store/slices/userSlices/LogoutSlice'
+import Tooltip from "./Tooltip.jsx";
 import { GetCart } from '../store/slices/cartSlices/GetCartSlice.jsx'
 
 
@@ -49,7 +50,7 @@ function Header() {
     <>
       <div className="w-full flex flex-col px-3 bg-site-color py-1 text-white">
         <div className="container mx-auto">
-          <div className="top flex items-center justify-end">
+          <div className="top hidden sm:flex items-center justify-end">
             <ul className="flex items-center justify-end gap-3 sm:gap-5 md:gap-8 text-xs sm:text-sm font-semibold">
               <li>
                 <Link
@@ -59,23 +60,29 @@ function Header() {
                   HELP & SUPPORT
                 </Link>
               </li>
-              {user !== null ? <li onClick={logoutHandler} className="hover:text-gray-200 cursor-pointer">LOGOUT</li> : <>
-                <li>
-                  <Link to={"/login"} className="hover:text-gray-200">
-                    LOGIN
-                  </Link>
-                </li>
-                <li>
+              {
+                user !== null ? <li onClick={logoutHandler} className="hover:text-gray-200 cursor-pointer">LOGOUT</li> : <>
+                  <li>
+                    <Link to={"/login"} className="hover:text-gray-200">
+                      LOGIN
+                    </Link>
+                  </li>
+                  {/* <li>
                   <Link to={"/signup"} className="hover:text-gray-200">
                     SIGNUP
                   </Link>
+                </li> */}
+                </>}
+              {
+                user !== null && <li>
+                  <Link to={"/user"} className="hover:text-gray-200 hidden sm:block uppercase">
+                    {user && user.data.name} ACCOUNT
+                  </Link>
+                  <Link to={"/user"} className="hover:text-gray-200 bg-gray-200 rounded-full block sm:hidden">
+                    <i className="fa-solid fa-user text-[18px] p-2"></i>
+                  </Link>
                 </li>
-              </>}
-              <li>
-                <Link to={"/user"} className="hover:text-gray-200 uppercase">
-                  {user && user.data.name} ACCOUNT
-                </Link>
-              </li>
+              }
               <li>
                 <Link to={"/"} className="hover:text-gray-200">
                   LANGUAGE
@@ -101,7 +108,7 @@ function Header() {
                     onChange={searchHandler}
                     placeholder="Search Here..."
                   />
-                  <div className={`absolute ${list ? "block" : "hidden"} top-10 left-0 text-black bg-white w-full py-1 shadow-md`}>
+                  <div className={`absolute ${list ? "block" : "hidden"} top-10 z-10 left-0 text-black bg-white w-full py-1 shadow-md`}>
                     <ul>
                       <li className="my-1 hover:bg-slate-100">
                         <Link to={"/shop?search=home"} className="w-full">
@@ -117,7 +124,49 @@ function Header() {
                   <i className="fa-solid fa-search"></i>
                 </button>
               </div>
-              <div className="cart ms-5 md:ms-8">
+              <ul className="flex sm:hidden items-center justify-end gap-2">
+
+                <li>
+                  <Tooltip text={"Help"} angle={"top"}>
+                    <Link
+                      to={"/"}
+                      className="py-1 px-[10px] text-lg text-site-color hover:bg-[rgb(241,206,188)] bg-[rgb(255,225,210)]"
+                    >
+                      <i className="fa-solid fa-question"></i>
+                      {/* HELP & SUPPORT */}
+                    </Link>
+                  </Tooltip>
+                </li>
+                {
+                  user == null &&
+                  <Tooltip text={"Login"} angle={"top"}>
+                    <li>
+                      <Link to={"/login"} className="py-1 px-2 text-lg text-site-color hover:bg-[rgb(241,206,188)] bg-[rgb(255,225,210)]">
+                        <i className="fa-solid fa-sign-in"></i>
+                        {/* LOGIN */}
+                      </Link>
+                    </li>
+                  </Tooltip>
+                }
+                {
+                  user !== null && <li>
+                    <Tooltip text={"Account"} angle={"top"}>
+                      <Link to={"/user"} title="Account" className="py-1 px-2 text-lg text-site-color hover:bg-[rgb(241,206,188)] bg-[rgb(255,225,210)] text-[18px]">
+                        <i className="fa-solid fa-user"></i>
+                      </Link>
+                    </Tooltip>
+                  </li>
+                }
+                <li>
+                  <Tooltip text={"Language"} angle={"top"}>
+                    <Link to={"/"} title="Language" className="py-1 px-2 text-lg text-site-color hover:bg-[rgb(241,206,188)] bg-[rgb(255,225,210)]">
+                      <i className="fa-solid fa-language"></i>
+                    </Link>
+                  </Tooltip>
+                </li>
+              </ul>
+              <div className="cart ms-2 sm:ms-4 md:ms-8">
+              <Tooltip text={"Cart"} angle={"top"}>
                 <Link
                   to={"/cart"}
                   className="py-1 px-2 relative sm:py-2 sm:px-3 text-lg text-site-color hover:bg-[rgb(241,206,188)] bg-[rgb(255,225,210)]"
@@ -125,6 +174,7 @@ function Header() {
                   <p className="absolute -top-1 -right-1 text-white text-xs bg-blue-500 rounded-full w-5 h-5 flex items-center justify-center">{cart && cart.data.length}</p>
                   <i className="fa-solid fa-cart-shopping"></i>
                 </Link>
+              </Tooltip>
               </div>
             </div>
           </div>

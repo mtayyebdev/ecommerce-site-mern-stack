@@ -2,16 +2,25 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { GetOrders } from '../../store/slices/orderSlices/GetOrdersSlice.jsx'
+import { GetUserInfo } from '../../store/slices/userSlices/GetUserInfoSlice.jsx'
 
 function ManageAccount() {
     const dispatch = useDispatch()
     const { orders } = useSelector(state => state.getorders)
     const { user } = useSelector((state) => state.userdata)
+    const { data } = useSelector((state) => state.getuserinfo)
 
 
-    useEffect(async() => {
-        await dispatch(GetOrders())
-    }, [GetOrders])
+    useEffect(() => {
+        dispatch(GetOrders())
+        dispatch(GetUserInfo());
+    }, [])
+
+    const infoData = data && data.find((info) => info.defaultAddress === true);
+
+    const reversedOrders = orders && [...orders.data].reverse().slice(0, 7);
+
+
     return (
         <>
             <div className="mt-3">
@@ -44,18 +53,18 @@ function ManageAccount() {
                             </div>
                             <div className="mt-4 text-sm">
                                 <h3 className="text-gray-600">DEFAULT SHIPPING ADDRESS</h3>
-                                <p className="mt-1 mb-1 font-semibold">Muhammad Tayyeb</p>
-                                <p className="text-gray-600">kalu Khan khat kali<br />Khyber Pakhtunkhwa - Swabi - Kalu Khan</p>
-                                <p className="text-gray-600">(+92) 3368212215</p>
+                                <p className="mt-1 mb-1 font-semibold">{infoData && infoData.name}</p>
+                                <p className="text-gray-600">{infoData && infoData.address}<br />{infoData && infoData.country} - {infoData && infoData.province} - {infoData && infoData.city} - {infoData && infoData.zone}</p>
+                                <p className="text-gray-600">(+92) {infoData && infoData.phone}</p>
                             </div>
                         </div>
 
                         {/* <!-- Default Billing Address --> */}
                         <div className=" text-sm w-full md:w-1/2 mt-11">
                             <h3 className="text-gray-600">DEFAULT BILLING ADDRESS</h3>
-                            <p className="mt-2 mb-1 font-semibold">Muhammad Tayyeb</p>
-                            <p className="text-gray-600">kalu Khan khat kali<br />Khyber Pakhtunkhwa - Swabi - Kalu Khan</p>
-                            <p className="text-gray-600">(+92) 3368212215</p>
+                            <p className="mt-2 mb-1 font-semibold">{user && user.data.name}</p>
+                            <p className="text-gray-600">{infoData && infoData.address}<br />{infoData && infoData.country} - {infoData && infoData.province} - {infoData && infoData.city} - {infoData && infoData.zone}</p>
+                            <p className="text-gray-600">(+92) {infoData && infoData.phone}</p>
                         </div>
                     </div>
                 </div>
@@ -78,7 +87,7 @@ function ManageAccount() {
                             <tbody>
                                 {/* <!-- Order 1 --> */}
                                 {
-                                    orders && orders.data.map((order) => (
+                                    reversedOrders && reversedOrders.map((order) => (
                                         <tr className='border-b'>
                                             <td className="px-4 py-2 whitespace-nowrap text-gray-800">{order.orderId}</td>
                                             <td className="px-4 py-2 whitespace-nowrap text-gray-800">{order.deliveryDate}</td>

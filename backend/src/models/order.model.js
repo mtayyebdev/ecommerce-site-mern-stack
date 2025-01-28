@@ -16,12 +16,15 @@ const orderSchema = new mongoose.Schema(
     address: String,
     color: String,
     country: String,
+    deliveryPlace: String,
     city: String,
     totalDiscount: {
       type: Number,
       default: 0,
     },
-    zipCode: String,
+    zone: String,
+    province:String,
+    landmark:String,
     deliveryDate: String,
     status: {
       type: String,

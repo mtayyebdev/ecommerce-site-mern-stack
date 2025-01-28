@@ -26,7 +26,7 @@ const GetSignleOrderSlice = createSlice({
             })
             .addCase(GetSingleOrder.fulfilled, (state, action) => {
                 state.loader = false;
-                state.order = action.payload;
+                state.order = action.payload.order;
             })
             .addCase(GetSingleOrder.rejected, (state,action) => {
                 state.loader = false;

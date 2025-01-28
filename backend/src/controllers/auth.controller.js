@@ -4,413 +4,446 @@ import jwt from "jsonwebtoken";
 import Order from "../models/order.model.js";
 import UserInfo from "../models/userinfo.model.js";
 import { UploadFile } from "../middlewares/uploadFile.middleware.js";
-import { v4 as uuidv4 } from "uuid";
+import { TryCatchHandler } from "../utils/TryCatchHandler.js";
 
-const SignUpController = async (req, res, next) => {
-  try {
-    const { name, email, phone, password, gender, birthday } = req.body;
-    const file = req.file
-      ? req.file
-      : "https://cdn.pixabay.com/photo/2023/12/05/19/05/mulled-claret-8432310_640.jpg";
+const SignUpController = TryCatchHandler(async (req, res, next) => {
+  const { name, email, phone, password, gender, birthday } = req.body;
+  const file = req.file
+    ? req.file
+    : "https://cdn.pixabay.com/photo/2023/12/05/19/05/mulled-claret-8432310_640.jpg";
 
-    if (
-      !name ||
-      !email ||
-      !phone ||
-      !password ||
-      !gender ||
-      !birthday ||
-      !file
-    ) {
-      return res.status(404).json({
-        message: "Please fill all the fields...",
-      });
-    }
-
-    const userExist = await User.findOne({ phone });
-
-    if (userExist) {
-      return res.status(404).json({ message: "Invalid User..." });
-    }
-
-    const rounds = await bcrypt.genSalt(10);
-    const hashedPass = await bcrypt.hash(password, rounds);
-
-    const image = file.path ? await UploadFile(file.path) : "";
-
-    const user = await User.create({
-      name,
-      email,
-      password: hashedPass,
-      avatar: image.url ? image.url : file,
-      gender,
-      birthday,
-      phone,
+  if (!name || !email || !phone || !password || !gender || !birthday || !file) {
+    return res.status(404).json({
+      message: "Please fill all the fields...",
     });
+  }
 
-    if (!user) {
-      return res.status(404).json({ message: "Invalid User..." });
-    }
+  const userExist = await User.findOne({ phone });
 
-    return res.status(200).json({
-      message: "Signup Successfully...",
+  if (userExist) {
+    return res.status(404).json({ message: "Invalid User..." });
+  }
+
+  const rounds = await bcrypt.genSalt(10);
+  const hashedPass = await bcrypt.hash(password, rounds);
+
+  const image = file.path ? await UploadFile(file.path) : "";
+
+  const user = await User.create({
+    name,
+    email,
+    password: hashedPass,
+    avatar: image.url ? image.url : file,
+    gender,
+    birthday,
+    phone,
+  });
+
+  if (!user) {
+    return res.status(404).json({ message: "Invalid User..." });
+  }
+
+  return res.status(200).json({
+    message: "Signup Successfully...",
+  });
+});
+
+const LoginController = TryCatchHandler(async (req, res, next) => {
+  const { phone, password } = req.body;
+
+  if (!phone || !password) {
+    return res.status(404).json({
+      message: "Please fill all the fields...",
     });
-  } catch (error) {
-    next(error);
   }
-};
 
-const LoginController = async (req, res, next) => {
-  try {
-    const { phone, password } = req.body;
+  const phoneExist = await User.findOne({ phone });
 
-    if (!phone || !password) {
-      return res.status(404).json({
-        message: "Please fill all the fields...",
-      });
-    }
-
-    const phoneExist = await User.findOne({ phone });
-
-    if (!phoneExist) {
-      return res.status(404).json({ message: "Invalid Phone or Password..." });
-    }
-
-    const passExist = await bcrypt.compare(password, phoneExist.password);
-
-    if (!passExist) {
-      return res.status(404).json({ message: "Invalid Phone or Password..." });
-    }
-
-    const jwtToken = jwt.sign(
-      {
-        id: phoneExist._id,
-        phoneId: phoneExist.phone,
-        emailId: phoneExist.email,
-        admin: phoneExist.isAdmin,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "10d",
-      }
-    );
-
-    const tenDaysInMilliseconds = 10 * 24 * 60 * 60 * 1000; // 10 days
-
-    res.cookie("token", jwtToken, {
-      httpOnly: true,
-      maxAge: tenDaysInMilliseconds,
-    });
-
-    return res.status(200).json({ message: "Login Successfully..." });
-  } catch (error) {
-    next(error);
+  if (!phoneExist) {
+    return res.status(404).json({ message: "Invalid Phone or Password..." });
   }
-};
 
-const getUserController = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.user._id);
+  const passExist = await bcrypt.compare(password, phoneExist.password);
 
-    if (!user) {
-      return res.status(404).json({ message: "Inavlid User" });
-    }
-
-    return res
-      .status(200)
-      .json({ message: "User found successfully...", data: user });
-  } catch (error) {
-    next(error);
+  if (!passExist) {
+    return res.status(404).json({ message: "Invalid Phone or Password..." });
   }
-};
 
-const LogoutController = async (req, res, next) => {
-  try {
-    res.clearCookie("token");
+  const jwtToken = jwt.sign(
+    {
+      id: phoneExist._id,
+      phoneId: phoneExist.phone,
+      emailId: phoneExist.email,
+      admin: phoneExist.isAdmin,
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "10d",
+    }
+  );
 
-    return res.status(200).json({ message: "Logged out Successfully" });
-  } catch (error) {
-    next(error);
+  const tenDaysInMilliseconds = 10 * 24 * 60 * 60 * 1000; // 10 days
+
+  res.cookie("token", jwtToken, {
+    httpOnly: true,
+    maxAge: tenDaysInMilliseconds,
+  });
+
+  return res.status(200).json({ message: "Login Successfully..." });
+});
+
+const getUserController = TryCatchHandler(async (req, res, next) => {
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    return res.status(404).json({ message: "Inavlid User" });
   }
-};
 
-const updateUserController = async (req, res, next) => {
-  try {
-    const { name, email, gender, birthday, phone } = req.body;
-    const file = req.file;
+  return res
+    .status(200)
+    .json({ message: "User found successfully...", data: user });
+});
 
-    const image = await UploadFile(file.path);
+const LogoutController = TryCatchHandler(async (req, res, next) => {
+  res.clearCookie("token");
+  return res.status(200).json({ message: "Logged out Successfully" });
+});
 
-    const user = await User.findByIdAndUpdate(req.user._id, {
-      name: name ? name : req.user.name,
-      email: email ? email : req.user.email,
-      phone: phone ? phone : req.user.phone,
-      gender: gender ? gender : req.user.gender,
-      birthday: birthday ? birthday : req.user.birthday,
-      avatar: image.url ? image.url : req.user.avatar,
-    });
+const updateUserController = TryCatchHandler(async (req, res, next) => {
+  const { name, email, gender, birthday, phone } = req.body;
 
-    if (!user) {
-      return res.status(404).json({ message: "Invalid User..." });
-    }
+  const user = await User.findByIdAndUpdate(req.user._id, {
+    name: name ? name : req.user.name,
+    email: email ? email : req.user.email,
+    phone: phone ? phone : req.user.phone,
+    gender: gender ? gender : req.user.gender,
+    birthday: birthday ? birthday : req.user.birthday,
+  });
 
-    return res.status(200).json({ message: "User updated Successfully." });
-  } catch (error) {
-    next(error);
+  if (!user) {
+    return res.status(404).json({ message: "Invalid User..." });
   }
-};
 
-const updateUserPasswordController = async (req, res, next) => {
-  try {
-    const { oldpassword, newpassword } = req.body;
+  return res.status(200).json({ message: "User updated Successfully." });
+});
 
-    if (!oldpassword || !newpassword) {
-      return res.status(404).json({ message: "Please fill all the fields..." });
-    }
+const updateUserPasswordController = TryCatchHandler(async (req, res, next) => {
+  const { oldPassword, newPassword } = req.body;
 
-    const passCorrect = await bcrypt.compare(oldpassword, req.user.password);
-
-    if (!passCorrect) {
-      return res.status(404).json({ message: "Invalid User..." });
-    }
-
-    const rounds = await bcrypt.genSalt(10);
-    const hashedPass = await bcrypt.hash(newpassword, rounds);
-
-    const user = await User.findByIdAndUpdate(req.user._id, {
-      password: hashedPass,
-    });
-
-    if (!user) {
-      return res.status(404).json({ message: "Invalid User..." });
-    }
-
-    return res.status(200).json({ message: "Password updated Successfully." });
-  } catch (error) {
-    next(error);
+  if (!oldPassword || !newPassword) {
+    return res.status(404).json({ message: "Please fill all the fields..." });
   }
-};
 
-const createUserInfoController = async (req, res, next) => {
-  try {
-    const { country, zipcode, city, address, phone } = req.body;
+  const passCorrect = await bcrypt.compare(oldPassword, req.user.password);
 
-    if (!country || !zipcode || !city || !address || !phone) {
-      return res.status(404).json({ message: "Please fill all the fields..." });
-    }
-
-    const user = await UserInfo.create({
-      country,
-      address,
-      city,
-      phone,
-      zipCode: zipcode,
-      user: req.user._id,
-    });
-
-    if (!user) {
-      return res.status(404).json({ message: "Invalid User..." });
-    }
-
-    return res.status(200).json({ message: "Address added Successfully." });
-  } catch (error) {
-    next(error);
+  if (!passCorrect) {
+    return res.status(404).json({ message: "Invalid Password..." });
   }
-};
 
-const updateUserInfoController = async (req, res, next) => {
-  try {
-    const { country, zipcode, city, address, phone } = req.body;
+  const rounds = await bcrypt.genSalt(10);
+  const hashedPass = await bcrypt.hash(newPassword, rounds);
+
+  const user = await User.findByIdAndUpdate(req.user._id, {
+    password: hashedPass,
+  });
+
+  if (!user) {
+    return res.status(404).json({ message: "Invalid User..." });
+  }
+
+  return res.status(200).json({ message: "Password Updated Successfully." });
+});
+
+const createUserInfoController = TryCatchHandler(async (req, res, next) => {
+  const {
+    country,
+    zone,
+    city,
+    name,
+    landmark,
+    province,
+    address,
+    phoneNumber,
+    addressType,
+  } = req.body;
+
+  if (
+    !country ||
+    !zone ||
+    !city ||
+    !address ||
+    !phoneNumber ||
+    !addressType ||
+    !name ||
+    !province
+  ) {
+    return res.status(404).json({ message: "Please fill all the fields..." });
+  }
+
+  const info = await UserInfo.create({
+    country,
+    address,
+    city,
+    phone: phoneNumber,
+    zone,
+    landmark,
+    addressType,
+    name,
+    province,
+    user: req.user._id,
+  });
+
+  if (!info) {
+    return res.status(404).json({ message: "Invalid User..." });
+  }
+
+  return res.status(200).json({ message: "Address added Successfully." });
+});
+
+const updateUserInfoController = TryCatchHandler(async (req, res, next) => {
+  const {
+    country,
+    zone,
+    city,
+    name,
+    landmark,
+    province,
+    address,
+    phoneNumber,
+    addressType,
+  } = req.body;
+  const id = req.params.id;
+
+  if (!id) {
+    return res.status(404).json({ message: "Invalid User..." });
+  }
+
+  const info = await UserInfo.findById(id);
+
+  if (!info) {
+    return res.status(404).json({ message: "Invalid User..." });
+  }
+
+  const user = await UserInfo.findByIdAndUpdate(id, {
+    country: country ? country : info.country,
+    addressType: addressType ? addressType : info.addressType,
+    zone: zone ? zone : info.zone,
+    landmark: landmark ? landmark : info.landmark,
+    name: name ? name : info.name,
+    province: province ? province : info.province,
+    phone: phoneNumber ? phoneNumber : info.phone,
+    address: address ? address : info.address,
+    city: city ? city : info.city,
+  });
+
+  if (!user) {
+    return res.status(404).json({ message: "Invalid User..." });
+  }
+
+  return res.status(200).json({ message: "Address Updated Successfully." });
+});
+
+const deleteUserInfoController = TryCatchHandler(async (req, res, next) => {
+  const id = req.params.id;
+
+  if (!id) {
+    return res.status(404).json({ message: "Invalid User..." });
+  }
+
+  const user = await UserInfo.findByIdAndDelete(id);
+
+  if (!user) {
+    return res.status(404).json({ message: "Invalid User..." });
+  }
+
+  return res.status(200).json({ message: "Address Deleted Successfully." });
+});
+
+const updateInfoByShippingController = TryCatchHandler(
+  async (req, res, next) => {
     const id = req.params.id;
 
-    if (!id) {
-      return res.status(404).json({ message: "Invalid User..." });
-    }
+    const info = await UserInfo.updateMany(
+      { user: req.user._id },
+      { defaultAddress: false }
+    );
 
-    const info = await UserInfo.findById(id);
-
-    if (!info) {
-      return res.status(404).json({ message: "Invalid User..." });
-    }
-
-    const user = await UserInfo.findByIdAndUpdate(id, {
-      country: country ? country : info.country,
-      zipCode: zipcode ? zipcode : info.zipCode,
-      phone: phone ? phone : info.phone,
-      address: address ? address : info.address,
-      city: city ? city : info.city,
+    const updateInfo = await UserInfo.findByIdAndUpdate(id, {
+      defaultAddress: true,
     });
 
-    if (!user) {
+    if (!updateInfo) {
       return res.status(404).json({ message: "Invalid User..." });
     }
 
     return res.status(200).json({ message: "Address Updated Successfully." });
-  } catch (error) {
-    next(error);
   }
-};
+);
 
-const deleteUserInfoController = async (req, res, next) => {
-  try {
-    const id = req.params.id;
+const getUserInfoController = TryCatchHandler(async (req, res, next) => {
+  const user = await UserInfo.find({ user: req.user._id });
 
-    if (!id) {
-      return res.status(404).json({ message: "Invalid User..." });
-    }
-
-    const user = await UserInfo.findByIdAndDelete(id);
-
-    if (!user) {
-      return res.status(404).json({ message: "Invalid User..." });
-    }
-
-    return res.status(200).json({ message: "Address Deleted Successfully." });
-  } catch (error) {
-    next(error);
+  if (!user) {
+    return res.status(404).json({ message: "Info not found." });
   }
-};
 
-const getUserInfoController = async (req, res, next) => {
-  try {
-    const user = await UserInfo.find({ user: req.user._id });
+  return res
+    .status(200)
+    .json({ message: "UserInfo found successfully...", data: user });
+});
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found." });
-    }
+const getSingleUserInfo = TryCatchHandler(async (req, res, next) => {
+  const id = req.params.id;
+  const info = await UserInfo.findOne({ user: req.user._id, _id: id });
 
-    return res
-      .status(200)
-      .json({ message: "UserInfo found successfully...", data: user });
-  } catch (error) {
-    next(error);
+  if (!info) {
+    return res.status(404).json({ message: "Info not found." });
   }
-};
 
-const createUserOrderController = async (req, res, next) => {
-  try {
-    const allData = req.body;
+  return res
+    .status(200)
+    .json({ message: "UserInfo found successfully.", data: info });
+});
 
-    if (!allData) {
-      return res.status(404).json({ message: "Please fill all the fields..." });
-    }
+const createUserOrderController = TryCatchHandler(async (req, res, next) => {
+  const allData = req.body;
 
-    const uuid = uuidv4();
-    const numericUuid = uuid.replace("/-/g", "");
-
-    const today = new Date();
-    const tenDaysLater = new Date(today);
-    tenDaysLater.setDate(today.getDate() + 10);
-    const monthAndDate = tenDaysLater.toLocaleDateString("en-US", {
-      month: "long",
-      day: "2-digit",
-    });
-
-    const orderIDs = await Promise.all(
-      allData.orders.map(async (order) => {
-        const result = await Order.create({
-          name: order.name,
-          color: order.color,
-          country: allData.userdata.country,
-          city: allData.userdata.city,
-          zipCode: allData.userdata.zipcode,
-          address: allData.userdata.address,
-          deliveryDate: monthAndDate,
-          image: order.image,
-          phone: allData.userdata.phone,
-          price: order.price,
-          product: order.productId,
-          quantity: order.quantity,
-          shippingFee: order.deliveryPrice,
-          size: order.size,
-          orderId: numericUuid,
-          username: allData.userdata.username,
-          category: order.category,
-          returns: order.guarantee,
-          discountPrice: order.discount,
-          user: req.user._id,
-          paymentType: allData.paymentType,
-          totalDiscount: order.totalDiscount,
-        });
-
-        return result;
-      })
-    );
-
-    return res
-      .status(200)
-      .json({ message: "Order created successfully...", ids: orderIDs });
-  } catch (error) {
-    next(error);
+  if (!allData) {
+    return res.status(404).json({ message: "Please fill all the fields..." });
   }
-};
 
-const getUserOrdersController = async (req, res, next) => {
-  try {
-    const order = await Order.find({ user: req.user._id });
+  const generateNumericId = () => {
+    const timestamp = Date.now().toString(); // 13 digits from current timestamp
+    const randomNumber = Math.floor(Math.random() * 10 ** 7)
+      .toString()
+      .padStart(7, "0"); // 7 random digits
+    return timestamp + randomNumber; // Combine to make a 20-digit number
+  };
 
-    if (!order) {
-      return res.status(404).json({ message: "Orders not found." });
-    }
+  const numericId = generateNumericId();
 
-    return res
-      .status(200)
-      .json({ message: "UserInfo found successfully...", data: order });
-  } catch (error) {
-    next(error);
+  const orderIDs = await Promise.all(
+    allData.orders.map(async (order) => {
+      const result = await Order.create({
+        name: order.name,
+        color: order.color,
+        country: allData.infoData.country,
+        city: allData.infoData.city,
+        zipCode: allData.infoData.zone,
+        address: allData.infoData.address,
+        deliveryDate: "pending",
+        image: order.image,
+        phone: allData.infoData.phone,
+        price: order.price,
+        product: order.productId,
+        quantity: order.quantity,
+        shippingFee: order.deliveryPrice,
+        size: order.size,
+        orderId: numericId,
+        deliveryPlace: allData.infoData.addressType,
+        username: allData.infoData.name,
+        category: order.category,
+        returns: order.guarantee,
+        discountPrice: order.discount,
+        user: req.user._id,
+        paymentType: allData.paymentType,
+        totalDiscount: order.totalDiscount,
+      });
+
+      return result;
+    })
+  );
+
+  return res
+    .status(200)
+    .json({ message: "Order created successfully...", ids: orderIDs });
+});
+
+const getUserOrdersController = TryCatchHandler(async (req, res, next) => {
+  const order = await Order.find({ user: req.user._id });
+
+  if (!order) {
+    return res.status(404).json({ message: "Orders not found." });
   }
-};
 
-const updateOrderController = async (req, res, next) => {
-  try {
-    const id = req.params.id;
-    const { orderStatus, paymentStatus, paymentType, shipping_fee } = req.body;
+  return res
+    .status(200)
+    .json({ message: "UserInfo found successfully...", data: order });
+});
 
-    if (!id) {
-      return res.status(404).json({ message: "Invalid order id..." });
-    }
+const updateOrderController = TryCatchHandler(async (req, res, next) => {
+  const id = req.params.id;
+  const { orderStatus, paymentStatus, paymentType, shipping_fee } = req.body;
 
-    const oldOrder = await Order.findById(id);
-    const newShippingFee = oldOrder.shippingFee + shipping_fee;
-
-    const order = await Order.findByIdAndUpdate(id, {
-      status: orderStatus,
-      paymentStatus,
-      paymentType,
-      shippingFee: newShippingFee,
-    });
-
-    if (!order) {
-      return res.status(404).json({ message: "Invalid order id..." });
-    }
-
-    return res.status(200).json({ message: "Order updated successfully..." });
-  } catch (error) {
-    next(error);
+  if (!id) {
+    return res.status(404).json({ message: "Invalid order id..." });
   }
-};
 
-const getSingleOrderController = async (req, res, next) => {
-  try {
-    const id = req.params.id;
-
-    if (!id) {
-      return res.status(404).json({ message: "Invalid Id..." });
-    }
-
-    const order = await Order.findById(id);
-
-    if (!order) {
-      return res.status(404).json({ message: "invalid order...." });
-    }
-
-    return res
-      .status(200)
-      .json({ message: "Order find successfully...", order });
-  } catch (error) {
-    next(error);
+  if (!orderStatus || !paymentStatus || !paymentType) {
+    return res.status(404).json({ message: "No data found..." });
   }
-};
+
+  const oldOrder = await Order.findById(id);
+  const newShippingFee = oldOrder.shippingFee + shipping_fee;
+
+  const today = new Date();
+  const tenDaysLater = new Date(today);
+  tenDaysLater.setDate(today.getDate() + 10);
+  const monthAndDate = tenDaysLater.toLocaleDateString("en-US", {
+    month: "long",
+    day: "2-digit",
+  });
+
+  const order = await Order.findByIdAndUpdate(id, {
+    status: orderStatus,
+    paymentStatus,
+    paymentType,
+    shippingFee: newShippingFee,
+    deliveryDate: monthAndDate,
+  });
+
+  if (!order) {
+    return res.status(404).json({ message: "Invalid order id..." });
+  }
+
+  return res.status(200).json({ message: "Order updated successfully..." });
+});
+
+const getSingleOrderController = TryCatchHandler(async (req, res, next) => {
+  const id = req.params.id;
+
+  if (!id) {
+    return res.status(404).json({ message: "Invalid Id..." });
+  }
+
+  const order = await Order.findById(id);
+
+  if (!order) {
+    return res.status(404).json({ message: "invalid order...." });
+  }
+
+  return res.status(200).json({ message: "Order find successfully...", order });
+});
+
+const CancelOrderController = TryCatchHandler(async (req, res, next) => {
+  const id = req.params.id;
+
+  if (!id) {
+    return res.status(404).json({ message: "Invalid Id..." });
+  }
+
+  const order = await Order.findById(id);
+
+  if (!order) {
+    return res.status(404).json({ message: "invalid order...." });
+  }
+
+  order.status = "Cancelled";
+  order.deliveryDate = "Cancelled";
+  order.save();
+
+  return res.status(200).json({ message: "Order Cancelled Successfully." });
+});
 
 export {
   SignUpController,
@@ -427,4 +460,7 @@ export {
   getUserOrdersController,
   updateOrderController,
   getSingleOrderController,
+  CancelOrderController,
+  getSingleUserInfo,
+  updateInfoByShippingController,
 };

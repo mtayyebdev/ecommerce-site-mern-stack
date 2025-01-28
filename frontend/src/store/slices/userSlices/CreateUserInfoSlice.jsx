@@ -1,9 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
+import { toast } from 'react-toastify'
 
 export const CreateUserInfo = createAsyncThunk("createuserinfo", async (data, { rejectWithValue }) => {
     try {
-        const res = await axios.post(`${import.meta.env.API}/api/auth/createinfo`,data)
+        const res = await axios.post(`${import.meta.env.VITE_API}/api/auth/createinfo`,data,{
+            withCredentials: true
+        })
         return res.data;
     }
     catch (error) {
@@ -26,6 +29,7 @@ const CreateUserInfoSlice = createSlice({
             .addCase(CreateUserInfo.fulfilled, (state, action) => {
                 state.loader = false;
                 state.data = action.payload;
+                toast.success(action.payload.message);
             })
             .addCase(CreateUserInfo.rejected, (state, action) => {
                 state.loader = false;

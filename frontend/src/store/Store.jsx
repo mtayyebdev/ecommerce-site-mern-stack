@@ -11,6 +11,8 @@ import GetUserInfoSlice from './slices/userSlices/GetUserInfoSlice.jsx'
 import UpdateUserSlice from './slices/userSlices/UpdateUserSlice.jsx'
 import UpdateUserInfoSlice from './slices/userSlices/UpdateUserInfoSlice.jsx'
 import UpdatePasswordSlice from './slices/userSlices/UpdatePasswordSlice.jsx'
+import GetSingleInfoSlice from './slices/userSlices/GetSingleUserInfo.jsx'
+import updateInfoShippingSlice from './slices/userSlices/UpdateInfoShippingSlice.jsx'
 
 // order slices..................................
 import CreateOrderSlice from './slices/orderSlices/CreateOrderSlice.jsx'
@@ -18,6 +20,7 @@ import GetOrdersSlice from './slices/orderSlices/GetOrdersSlice.jsx'
 import PendingOrderSlice from './slices/orderSlices/PendingOrderSlice.jsx'
 import UpdateOrderSlice from './slices/orderSlices/UpdateOrderSlice.jsx'
 import GetSingleOrderSlice from './slices/orderSlices/GetSingleOrderSlice.jsx'
+import CancelOrderSlice from './slices/orderSlices/CancelOrderSlice.jsx'
 
 // coupon slices...............................
 import GetCouponSlice from './slices/couponSlices/GetCouponSlice.jsx'
@@ -46,6 +49,8 @@ export const store = configureStore({
         updateuser: UpdateUserSlice,
         updateuserinfo: UpdateUserInfoSlice,
         updatepassword: UpdatePasswordSlice,
+        getsingleinfo:GetSingleInfoSlice,
+        updateinfoshipping: updateInfoShippingSlice,
 
         // order slices.............................
         createorder: CreateOrderSlice,
@@ -53,6 +58,7 @@ export const store = configureStore({
         pendingorder: PendingOrderSlice,
         updateorder:UpdateOrderSlice,
         getsingleorder:GetSingleOrderSlice,
+        cancelorder:CancelOrderSlice,
 
         // coupon slices...............................
         getcoupon: GetCouponSlice,
