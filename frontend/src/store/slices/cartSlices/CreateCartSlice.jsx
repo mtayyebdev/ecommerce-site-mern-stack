@@ -1,11 +1,13 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
-import {toast} from 'react-toastify'
+import { toast } from 'react-toastify'
 
-export const CreateCart = createAsyncThunk('createcart', async ({ quantity, id }, { rejectWithValue }) => {
+export const CreateCart = createAsyncThunk('createcart', async ({ quantity, id, selectedColor, selectedSize }, { rejectWithValue }) => {
     try {
         const res = await axios.post(`${import.meta.env.VITE_API}/api/cart/createcart/${id}`, {
-            quantity
+            quantity,
+            color: selectedColor,
+            size: selectedSize
         }, {
             withCredentials: true
         })

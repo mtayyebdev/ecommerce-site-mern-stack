@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import { UserData } from '../../store/slices/userSlices/UserdataSlice.jsx'
@@ -50,13 +49,12 @@ function Profile() {
       }
     }
     if (profileData.phone !== "") {
-      if (profileData.phone.length !== 10) {
+      if (profileData.phone.length !== 11) {
         toast.error('Please enter a valid phone number')
         return
       }
     }
     setallFields(false)
-    console.log(profileData);
     await dispatch(UpdateUser(profileData))
       .then((res) => {
         if (res.type === 'updateuser/fulfilled') {
@@ -75,7 +73,6 @@ function Profile() {
       toast.error('Password must be at least 8 characters long')
       return
     }
-    console.log(passwordData);
     await dispatch(UpdatePassword(passwordData))
       .then((res) => {
         if (res.type === 'updatepassword/fulfilled') {
@@ -84,7 +81,6 @@ function Profile() {
         }
       })
   }
-
 
   return (
     <>

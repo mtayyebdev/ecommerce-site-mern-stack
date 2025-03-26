@@ -1,7 +1,30 @@
 import React, { useState } from 'react'
+import { GetContacts } from '../store/slices/adminSlices/GetContactSlice.jsx'
+import { useSelector, useDispatch } from 'react-redux'
+import { DeleteContact } from '../store/slices/adminSlices/DeleteContactSlice.jsx'
 
 function Contacts() {
+  const dispatch = useDispatch()
+  const { contacts } = useSelector((state) => state.getcontacts)
   const [preview, setpreview] = useState(false)
+  const [singleContact, setsingleContact] = useState(null)
+
+  const ReverseContacts = contacts && [...contacts.data].reverse();
+
+  const deleteContact = async (id) => {
+    await dispatch(DeleteContact(id))
+      .then((res) => {
+        console.log(res.type);
+        
+        if (res.type === "deletecontact/fulfilled") {
+          dispatch(GetContacts())
+        }
+      })
+      .catch((err) => {
+        console.log("contact deleting error: ", err);
+      })
+  }
+
   return (
     <div className="w-full">
       <div>
@@ -21,7 +44,7 @@ function Contacts() {
                 Email
               </th>
               <th scope="col" className="px-6 py-3">
-                Phone
+                Reason
               </th>
               <th scope="col" className="px-6 py-3">
                 Message
@@ -35,106 +58,30 @@ function Contacts() {
             </tr>
           </thead>
           <tbody>
-            <tr className="bg-white border-b hover:bg-gray-50">
-              <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                M Tayyeb
-              </th>
-              <td scope="row" className="px-6 py-4 whitespace-nowrap">
-                tayyabkhankqw87823@gmail.com
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                +92 32498234234
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                hi there is nice store
-              </td>
-              <td className="px-6 py-4">
-                <i className='fa-solid fa-eye text-blue-500 hover:text-blue-600 cursor-pointer' onClick={() => setpreview(true)}></i>
-              </td>
-              <td className="px-6 py-4">
-                <i className='fa-solid fa-trash-alt text-blue-500 hover:text-blue-600 cursor-pointer'></i>
-              </td>
-            </tr>
-            <tr className="bg-white border-b hover:bg-gray-50">
-              <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                M Tayyeb
-              </th>
-              <td scope="row" className="px-6 py-4 whitespace-nowrap">
-                tayyabkhankqw87823@gmail.com
-              </td>
-              <td className="px-6 py-4">
-                +92 32498234234
-              </td>
-              <td className="px-6 py-4">
-                hi there is nice store
-              </td>
-              <td className="px-6 py-4">
-                <i className='fa-solid fa-eye text-blue-500 hover:text-blue-600 cursor-pointer'></i>
-              </td>
-              <td className="px-6 py-4">
-                <i className='fa-solid fa-trash-alt text-blue-500 hover:text-blue-600 cursor-pointer'></i>
-              </td>
-            </tr>
-            <tr className="bg-white border-b hover:bg-gray-50">
-              <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                M Tayyeb
-              </th>
-              <td scope="row" className="px-6 py-4 whitespace-nowrap">
-                tayyabkhankqw87823@gmail.com
-              </td>
-              <td className="px-6 py-4">
-                +92 32498234234
-              </td>
-              <td className="px-6 py-4">
-                hi there is nice store
-              </td>
-              <td className="px-6 py-4">
-                <i className='fa-solid fa-eye text-blue-500 hover:text-blue-600 cursor-pointer'></i>
-              </td>
-              <td className="px-6 py-4">
-                <i className='fa-solid fa-trash-alt text-blue-500 hover:text-blue-600 cursor-pointer'></i>
-              </td>
-            </tr>
-            <tr className="bg-white border-b hover:bg-gray-50">
-              <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                M Tayyeb
-              </th>
-              <td scope="row" className="px-6 py-4 whitespace-nowrap">
-                tayyabkhankqw87823@gmail.com
-              </td>
-              <td className="px-6 py-4">
-                +92 32498234234
-              </td>
-              <td className="px-6 py-4">
-                hi there is nice store
-              </td>
-              <td className="px-6 py-4">
-                <i className='fa-solid fa-eye text-blue-500 hover:text-blue-600 cursor-pointer'></i>
-              </td>
-              <td className="px-6 py-4">
-                <i className='fa-solid fa-trash-alt text-blue-500 hover:text-blue-600 cursor-pointer'></i>
-              </td>
-            </tr>
-            <tr className="bg-white border-b hover:bg-gray-50">
-              <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                M Tayyeb
-              </th>
-              <td scope="row" className="px-6 py-4 whitespace-nowrap">
-                tayyabkhankqw87823@gmail.com
-              </td>
-              <td className="px-6 py-4">
-                +92 32498234234
-              </td>
-              <td className="px-6 py-4">
-                hi there is nice store
-              </td>
-              <td className="px-6 py-4">
-                <i className='fa-solid fa-eye text-blue-500 hover:text-blue-600 cursor-pointer'></i>
-              </td>
-              <td className="px-6 py-4">
-                <i className='fa-solid fa-trash-alt text-blue-500 hover:text-blue-600 cursor-pointer'></i>
-              </td>
-            </tr>
+            {
+              ReverseContacts && ReverseContacts.map((contact, i) => (
+                <tr className="bg-white border-b hover:bg-gray-50" key={i}>
+                  <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                    {contact.name}
+                  </th>
+                  <td scope="row" className="px-6 py-4 whitespace-nowrap">
+                    {contact.email}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {contact.reason}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {contact.message.slice(0, 10)}
+                  </td>
+                  <td className="px-6 py-4">
+                    <i className='fa-solid fa-eye text-blue-500 hover:text-blue-600 cursor-pointer' onClick={() => { setpreview(true); setsingleContact(contact) }}></i>
+                  </td>
+                  <td className="px-6 py-4">
+                    <i className='fa-solid fa-trash-alt text-blue-500 hover:text-blue-600 cursor-pointer' onClick={() => deleteContact(contact._id)}></i>
+                  </td>
+                </tr>
+              ))
+            }
           </tbody>
         </table>
       </div>
@@ -145,20 +92,28 @@ function Contacts() {
           <div className="flex items-center justify-between flex-wrap gap-5">
             <div className="name">
               <h3 className='text-gray-600  text-lg font-semibold'>Name</h3>
-              <p className='text-base'>M Tayyeb</p>
-            </div>
-            <div className="phone">
-              <h3 className='text-gray-600 font-semibold text-lg'>Phone</h3>
-              <p className='text-base'>+92 3284489324832</p>
+              <p className='text-base'>{singleContact&&singleContact.name}</p>
             </div>
             <div className="email">
               <h3 className='text-gray-600 font-semibold text-lg'>Email</h3>
-              <p className='text-base'>tayyabkhankqw878@gmail.com</p>
+              <p className='text-base'>{singleContact&&singleContact.email}</p>
+            </div>
+            <div className="phone">
+              <h3 className='text-gray-600 font-semibold text-lg'>Reason</h3>
+              <p className='text-base'>{singleContact&&singleContact.reason}</p>
+            </div>
+            <div className="orderNumber">
+              <h3 className='text-gray-600 font-semibold text-lg'>Order Number</h3>
+              <p className='text-base'>{singleContact&&singleContact.orderNumber ? singleContact.orderNumber : "No Order Id Found."}</p>
             </div>
           </div>
           <div className="message mt-5">
             <h3 className='text-gray-600 text-lg font-semibold'>Message</h3>
-            <p className='text-base'>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Atque earum eligendi, expedita veritatis ipsum aut quas alias deleniti aperiam, excepturi pariatur officiis velit! Rem aspernatur obcaecati fugit architecto vero nesciunt.</p>
+            <p className='text-base'>{singleContact&&singleContact.message}</p>
+          </div>
+          <div className="image mt-5">
+            <h3 className='text-gray-600 text-lg font-semibold'>File</h3>
+            {singleContact&&singleContact.image ? <img src={singleContact.image} className='w-[200px]' /> : "No File Found."}
           </div>
         </div>
       </div>

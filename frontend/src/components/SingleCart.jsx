@@ -4,7 +4,7 @@ import { DeleteCart } from '../store/slices/cartSlices/DeleteCartSlice.jsx'
 import { GetCart } from '../store/slices/cartSlices/GetCartSlice.jsx'
 import { UpdateCart } from '../store/slices/cartSlices/UpdateCartSlice.jsx'
 
-function SingleCart({ image, name, color, price, discountPrice, checkedHandler,isSelected, quantity, id }) {
+function SingleCart({ image, name, color, price, discountPrice, checkedHandler, isSelected, quantity, id }) {
     const dispatch = useDispatch()
     const [quantitynew, setquantitynew] = useState(quantity);
 
@@ -21,7 +21,7 @@ function SingleCart({ image, name, color, price, discountPrice, checkedHandler,i
         await dispatch(UpdateCart(data))
         await dispatch(GetCart())
     }
-    
+
 
 
     return (

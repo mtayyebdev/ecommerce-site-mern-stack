@@ -1,10 +1,12 @@
 import { v2 as cloudinary } from "cloudinary";
 import multer from "multer";
 
+// take files using multer.....................
 const storage = multer.diskStorage({});
 
 const upload = multer({ storage });
 
+// upload files to cloudinary................
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,

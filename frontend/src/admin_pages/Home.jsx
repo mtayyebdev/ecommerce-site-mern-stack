@@ -1,6 +1,18 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { GetOrders } from '../store/slices/adminSlices/GetOrdersSlice.jsx'
 
 function Home() {
+  const { orders } = useSelector((state) => state.getadminorders)
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(GetOrders())
+  }, [])
+
+  const ReversedOrders = orders && [...orders.data].reverse();
+
+
   return (
     <>
       <div className="w-full">
@@ -21,10 +33,13 @@ function Home() {
                   Product name
                 </th>
                 <th scope="col" className="px-6 py-3">
-                  Color
+                  Category
+                </th>
+                <th scope="col" className="px-6 py-3 whitespace-nowrap">
+                  Payment Status
                 </th>
                 <th scope="col" className="px-6 py-3">
-                  Category
+                  Status
                 </th>
                 <th scope="col" className="px-6 py-3">
                   Price
@@ -32,91 +47,30 @@ function Home() {
               </tr>
             </thead>
             <tbody>
-              <tr className="bg-white border-b hover:bg-gray-50">
-                <td className="px-6 py-4">
-                  #236479434293842893
-                </td>
-                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                  Apple MacBook Pro 17"
-                </th>
-                <td className="px-6 py-4">
-                  Silver
-                </td>
-                <td className="px-6 py-4">
-                  Laptop
-                </td>
-                <td className="px-6 py-4">
-                  $2999
-                </td>
-              </tr>
-              <tr className="bg-white border-b hover:bg-gray-50">
-                <td className="px-6 py-4">
-                  #236479434293842893
-                </td>
-                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                  Apple MacBook Pro 17"
-                </th>
-                <td className="px-6 py-4">
-                  Silver
-                </td>
-                <td className="px-6 py-4">
-                  Laptop
-                </td>
-                <td className="px-6 py-4">
-                  $2999
-                </td>
-              </tr>
-              <tr className="bg-white border-b hover:bg-gray-50">
-                <td className="px-6 py-4">
-                  #236479434293842893
-                </td>
-                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                  Apple MacBook Pro 17"
-                </th>
-                <td className="px-6 py-4">
-                  Silver
-                </td>
-                <td className="px-6 py-4">
-                  Laptop
-                </td>
-                <td className="px-6 py-4">
-                  $2999
-                </td>
-              </tr>
-              <tr className="bg-white border-b hover:bg-gray-50">
-                <td className="px-6 py-4">
-                  #236479434293842893
-                </td>
-                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                  Apple MacBook Pro 17"
-                </th>
-                <td className="px-6 py-4">
-                  Silver
-                </td>
-                <td className="px-6 py-4">
-                  Laptop
-                </td>
-                <td className="px-6 py-4">
-                  $2999
-                </td>
-              </tr>
-              <tr className="bg-white border-b hover:bg-gray-50">
-                <td className="px-6 py-4">
-                  #236479434293842893
-                </td>
-                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                  Apple MacBook Pro 17"
-                </th>
-                <td className="px-6 py-4">
-                  Silver
-                </td>
-                <td className="px-6 py-4">
-                  Laptop
-                </td>
-                <td className="px-6 py-4">
-                  $2999
-                </td>
-              </tr>
+              {
+                ReversedOrders && ReversedOrders.map((order, i) => (
+                  <tr className="bg-white border-b hover:bg-gray-50" key={i}>
+                    <td className="px-6 py-4">
+                      {order.orderId}
+                    </td>
+                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                      {order.name.slice(0, 38)}
+                    </th>
+                    <td className="px-6 py-4">
+                      {order.category}
+                    </td>
+                    <td className="px-6 py-4">
+                      {order.paymentStatus}
+                    </td>
+                    <td className="px-6 py-4">
+                      {order.status}
+                    </td>
+                    <td className="px-6 py-4">
+                      Rs.{order.price}
+                    </td>
+                  </tr>
+                ))
+              }
             </tbody>
           </table>
         </div>

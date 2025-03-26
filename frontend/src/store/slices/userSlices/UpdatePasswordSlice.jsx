@@ -34,6 +34,7 @@ const UpdatePasswordSlice = createSlice({
             .addCase(UpdatePassword.rejected, (state, action) => {
                 state.loading = false;
                 state.err = action.payload;
+                toast.error(action.payload.response.data.message)
             })
     }
 })

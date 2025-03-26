@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { GetOrders } from '../../store/slices/orderSlices/GetOrdersSlice.jsx'
-import { GetUserInfo } from '../../store/slices/userSlices/GetUserInfoSlice.jsx'
 
 function ManageAccount() {
     const dispatch = useDispatch()
@@ -10,16 +8,9 @@ function ManageAccount() {
     const { user } = useSelector((state) => state.userdata)
     const { data } = useSelector((state) => state.getuserinfo)
 
-
-    useEffect(() => {
-        dispatch(GetOrders())
-        dispatch(GetUserInfo());
-    }, [])
-
     const infoData = data && data.find((info) => info.defaultAddress === true);
 
     const reversedOrders = orders && [...orders.data].reverse().slice(0, 7);
-
 
     return (
         <>

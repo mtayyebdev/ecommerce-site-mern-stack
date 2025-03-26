@@ -18,6 +18,7 @@ function Checkout() {
   const { data } = useSelector((state) => state.getuserinfo)
   const [formId, setformId] = useState()
   const [addressForm, setaddressForm] = useState(false)
+  const [totalItems, settotalItems] = useState(0)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -31,23 +32,24 @@ function Checkout() {
     addressType: 'Home'
   });
 
-
   const infoData = data && data.find((info) => info.defaultAddress === true);
-
 
   useEffect(() => {
     dispatch(GetUserInfo())
 
-    let totalShipping = 0
-    let subItems = 0
-    let discount = 0
+    let totalShipping = 0;
+    let subItems = 0;
+    let discount = 0;
+    let quantity = 0;
     orders.forEach((order, i) => {
+      quantity += order.quantity;
       discount = order.totalDiscount;
-      totalShipping += order.deliveryPrice;
-      subItems += order.price;
+      totalShipping += order.deliveryPrice * order.quantity;
+      subItems += order.price * order.quantity;
     })
     let total = subItems + totalShipping;
     settotalShippingFee(totalShipping)
+    settotalItems(quantity)
     setsubItemsPrice(subItems)
     settotalPrice(total)
   }, [orders])
@@ -55,7 +57,6 @@ function Checkout() {
   const deleteHandler = (id) => {
     dispatch(DeleteOrderData(id))
   }
-
 
   const orderHandler = async () => {
     const data = {
@@ -97,11 +98,9 @@ function Checkout() {
     setaddressForm(true)
   }
 
-
-
   return (
     <>
-      <div className={`w-full ${addressForm?"hidden":"block"} py-4`}>
+      <div className={`w-full ${addressForm ? "hidden" : "block"} py-4`}>
         <div className="flex flex-col md:flex-row gap-3">
           <div className="left w-full md:w-[60%] lg:w-[70%]">
             <div className="address bg-white">
@@ -151,7 +150,7 @@ function Checkout() {
             <div className='mt-3'>
               <h2 className='font-semibold text-lg'>Order Summary</h2>
               <div className="flex items-center justify-between mt-2">
-                <h3 className='text-gray-500'>Items Total ({orders.length} items)</h3>
+                <h3 className='text-gray-500'>Items Total ({totalItems} items)</h3>
                 <h3>Rs. {subItemsPrice}</h3>
               </div>
               <div className="flex items-center justify-between mt-2">

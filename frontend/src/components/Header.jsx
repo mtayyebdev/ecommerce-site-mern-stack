@@ -76,7 +76,7 @@ function Header() {
               {
                 user !== null && <li>
                   <Link to={"/user"} className="hover:text-gray-200 hidden sm:block uppercase">
-                    {user && user.data.name} ACCOUNT
+                    {user && user.data.name.split(" ")[1]} ACCOUNT
                   </Link>
                   <Link to={"/user"} className="hover:text-gray-200 bg-gray-200 rounded-full block sm:hidden">
                     <i className="fa-solid fa-user text-[18px] p-2"></i>

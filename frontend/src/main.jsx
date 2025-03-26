@@ -26,7 +26,8 @@ import {
   Returns,
   Reviews,
   UserProfile,
-  OrderDetails
+  OrderDetails,
+  Contact
 } from './pages/index.js'
 import {
   Admin_home,
@@ -39,8 +40,10 @@ import {
   Admin_Users,
   Admin_Contacts,
   Update_products,
-  Create_products
+  Create_products,
+  Create_coupons
 } from './admin_pages/index.js'
+import Error404 from './components/Error404.jsx';
 
 const router = createBrowserRouter(
   [
@@ -119,8 +122,13 @@ const router = createBrowserRouter(
           element: <Payment />,
           path: "/payment/:id"
         },
+        {
+          element: <Contact />,
+          path: "/contact"
+        },
       ]
-    }, {
+    },
+    {
       element: <Admin_home />,
       path: "/web-admin",
       children: [
@@ -142,15 +150,19 @@ const router = createBrowserRouter(
         },
         {
           element: <Update_user />,
-          path: "update-user"
+          path: "update-user/:id"
         },
         {
           element: <Update_products />,
-          path: "update-product"
+          path: "update-product/:id"
         },
         {
           element: <Create_products />,
           path: "create-product"
+        },
+        {
+          element: <Create_coupons />,
+          path: "create-coupon"
         },
         {
           element: <Admin_Products />,
@@ -165,6 +177,10 @@ const router = createBrowserRouter(
           path: "users"
         },
       ]
+    },
+    {
+      path: "*",
+      element: <Error404 />
     }
   ]
 )

@@ -102,7 +102,7 @@ function Home() {
                   return (
                     <Product
                       key={i}
-                      image={data.frontImage}
+                      image={data.gallaryImages[0]}
                       id={data._id}
                       name={data.name}
                       discount={data.discountPrice}
@@ -123,7 +123,7 @@ function Home() {
                   return (
                     <Product
                       key={i}
-                      image={data.frontImage}
+                      image={data.gallaryImages[0]}
                       name={data.name}
                       discount={data.discountPrice}
                       price={data.price}

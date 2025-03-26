@@ -1,11 +1,36 @@
-import React, { useState } from 'react'
-import { Outlet, Link } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { Outlet } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import { UserData } from '../store/slices/userSlices/UserdataSlice.jsx'
 import { ChartDataSmall, Admin_Navbar, Admin_Header } from '../admin_components/index.js'
+import Error404 from '../components/Error404.jsx'
+import { GetUsers } from '../store/slices/adminSlices/GetUsersSlice.jsx'
+import { GetProducts } from '../store/slices/productSlices/GetProductsSlice.jsx'
+import { GetOrders } from '../store/slices/adminSlices/GetOrdersSlice.jsx'
+import { GetCoupons } from '../store/slices/adminSlices/GetCouponsSlice.jsx'
+import { GetContacts } from '../store/slices/adminSlices/GetContactSlice.jsx'
 
 function Admin_home() {
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.userdata)
+  const { users } = useSelector((state) => state.getadminusers)
+  const { products } = useSelector((state) => state.getadminproducts)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  useEffect(() => {
+    dispatch(UserData())
+    dispatch(GetUsers())
+    dispatch(GetProducts())
+    dispatch(GetOrders())
+    dispatch(GetCoupons())
+    dispatch(GetContacts())
+  }, [])
+
+
+
+
   return (
-    <>
+    user && user.data.isAdmin ? <>
       <div className="">
         <div className="flex h-screen overflow-hidden">
           <Admin_Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
@@ -56,7 +81,7 @@ function Admin_home() {
                       />
                     </svg>
                   </ChartDataSmall>
-                  <ChartDataSmall title="Total Product" total="2.450" rate="2.59%" levelUp>
+                  <ChartDataSmall title="Total Product" total={products && products.data.length} rate="2.59%" levelDown={products && products.data.length < 100} levelUp={products && products.data.length > 100}>
                     <svg
                       className="fill-primary"
                       width="22"
@@ -75,7 +100,7 @@ function Admin_home() {
                       />
                     </svg>
                   </ChartDataSmall>
-                  <ChartDataSmall title="Total Users" total="3.456" rate="0.95%" levelDown>
+                  <ChartDataSmall title="Total Users" total={users && users.data.length} rate="0.95%" levelDown={users && users.data.length < 100} levelUp={users && users.data.length > 100}>
                     <svg
                       className="fill-primary"
                       width="22"
@@ -99,15 +124,16 @@ function Admin_home() {
                     </svg>
                   </ChartDataSmall>
                 </div>
-               <div className="mt-5">
-               <Outlet />
-               </div>
+                <div className="mt-5">
+                  <Outlet />
+                </div>
               </div>
             </main>
           </div>
         </div>
       </div>
-    </>
+    </> :
+      <Error404 />
 
   )
 }

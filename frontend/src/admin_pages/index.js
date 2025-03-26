@@ -9,6 +9,7 @@ import Admin_Contacts from "./Contacts";
 import Update_user from "./Update_user";
 import Update_products from "./Update_products";
 import Create_products from "./Create_products";
+import Create_coupons from "./Create_coupons";
 
 export {
   Admin_home,
@@ -22,4 +23,5 @@ export {
   Admin_Contacts,
   Create_products,
   Update_products,
+  Create_coupons,
 };

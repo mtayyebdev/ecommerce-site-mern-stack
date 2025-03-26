@@ -35,43 +35,94 @@ import DeleteAllCartsSlice from './slices/cartSlices/DeleteAllCartsSlice.jsx'
 // products slices...............................
 import GetProductsSlice from './slices/productSlices/GetProductsSlice.jsx'
 import GetSingleProductSlice from './slices/productSlices/GetSingleProductSlice.jsx'
+import SearchProductsSlice from './slices/productSlices/SearchProductsSlice.jsx'
+import SendProductsCommentSlice from './slices/productSlices/SendProductsCommentSlice.jsx'
+import GetProductsReviewsSlice from './slices/productSlices/GetProductsReviewsSlice.jsx'
+
+// contact slices..................................
+import CreateContactSlice from './slices/contactSlices/CreateContactSlice.jsx'
+
+// admin slices...........................................
+import GetUsersAdminSlice from './slices/adminSlices/GetUsersSlice.jsx'
+import GetProductsAdminSlice from './slices/adminSlices/GetProductsSlice.jsx'
+import GetCouponsAdminSlice from './slices/adminSlices/GetCouponsSlice.jsx'
+import GetOrdersAdminSlice from './slices/adminSlices/GetOrdersSlice.jsx'
+import GetSingleUserSlice from './slices/adminSlices/GetSingleUserSlice.jsx'
+import GetSingleProductAdminSlice from './slices/adminSlices/GetSingleProductSlice.jsx'
+import DeleteUsersSlice from './slices/adminSlices/DeleteUserSlice.jsx'
+import DeleteProductsSlice from './slices/adminSlices/DeleteProductsSlice.jsx'
+import UpdateUserAdminSlice from './slices/adminSlices/UpdateUserSlice.jsx'
+import CreateProductAdminSlice from './slices/adminSlices/CreateProductSlice.jsx'
+import UpdateProductAdminSlice from './slices/adminSlices/UpdateProductSlice.jsx'
+import CreateCouponAdminSlice from './slices/adminSlices/CreateCouponSlice.jsx'
+import DeleteCouponAdminSlice from './slices/adminSlices/DeleteCouponSlice.jsx'
+import DeleteOrderAdminSlice from './slices/adminSlices/DeleteOrderSlice.jsx'
+import UpdateOrderStatusAdminSlice from './slices/adminSlices/UpdateOrderStatusSlice.jsx'
+import GetContactsAdminSlice from './slices/adminSlices/GetContactSlice.jsx'
+import DeleteContactAdminSlice from './slices/adminSlices/DeleteContactSlice.jsx'
+
 
 export const store = configureStore({
-    reducer: {
-        // user slices...............................
-        userdata: UserDataSlice,
-        signup: SignupSlice,
-        login: LoginSlice,
-        logout: LogoutSlice,
-        createuserinfo: CreateUserInfoSlice,
-        deleteuserinfo: DeleteUserInfoSlice,
-        getuserinfo: GetUserInfoSlice,
-        updateuser: UpdateUserSlice,
-        updateuserinfo: UpdateUserInfoSlice,
-        updatepassword: UpdatePasswordSlice,
-        getsingleinfo:GetSingleInfoSlice,
-        updateinfoshipping: updateInfoShippingSlice,
+  reducer: {
+    // user slices...............................
+    userdata: UserDataSlice,
+    signup: SignupSlice,
+    login: LoginSlice,
+    logout: LogoutSlice,
+    createuserinfo: CreateUserInfoSlice,
+    deleteuserinfo: DeleteUserInfoSlice,
+    getuserinfo: GetUserInfoSlice,
+    updateuser: UpdateUserSlice,
+    updateuserinfo: UpdateUserInfoSlice,
+    updatepassword: UpdatePasswordSlice,
+    getsingleinfo: GetSingleInfoSlice,
+    updateinfoshipping: updateInfoShippingSlice,
 
-        // order slices.............................
-        createorder: CreateOrderSlice,
-        getorders: GetOrdersSlice,
-        pendingorder: PendingOrderSlice,
-        updateorder:UpdateOrderSlice,
-        getsingleorder:GetSingleOrderSlice,
-        cancelorder:CancelOrderSlice,
+    // order slices.............................
+    createorder: CreateOrderSlice,
+    getorders: GetOrdersSlice,
+    pendingorder: PendingOrderSlice,
+    updateorder: UpdateOrderSlice,
+    getsingleorder: GetSingleOrderSlice,
+    cancelorder: CancelOrderSlice,
 
-        // coupon slices...............................
-        getcoupon: GetCouponSlice,
+    // coupon slices...............................
+    getcoupon: GetCouponSlice,
 
-        // cart slices...............................
-        createcart: CreateCartSlice,
-        deletecart: DeleteCartSlice,
-        getcart: GetCartSlice,
-        updatecart: UpdateCartSlice,
-        deleteallcarts: DeleteAllCartsSlice,
+    // cart slices...............................
+    createcart: CreateCartSlice,
+    deletecart: DeleteCartSlice,
+    getcart: GetCartSlice,
+    updatecart: UpdateCartSlice,
+    deleteallcarts: DeleteAllCartsSlice,
 
-        // products slices...............................
-        getproducts: GetProductsSlice,
-        getsingleproduct: GetSingleProductSlice
-    }
+    // products slices...............................
+    getproducts: GetProductsSlice,
+    getsingleproduct: GetSingleProductSlice,
+    searchproducts: SearchProductsSlice,
+    sendcomment: SendProductsCommentSlice,
+    getproductsreviews:GetProductsReviewsSlice,
+
+    // contact slices................................
+    createcontact: CreateContactSlice,
+
+    // admin slices....................................
+    getadminusers: GetUsersAdminSlice,
+    getadminproducts: GetProductsAdminSlice,
+    getadminorders: GetOrdersAdminSlice,
+    getadmincoupons: GetCouponsAdminSlice,
+    deleteadminusers: DeleteUsersSlice,
+    deleteadminproducts: DeleteProductsSlice,
+    updateadminuser: UpdateUserAdminSlice,
+    createadminproduct: CreateProductAdminSlice,
+    updateadminproduct: UpdateProductAdminSlice,
+    createadmincoupon: CreateCouponAdminSlice,
+    deleteadmincoupon: DeleteCouponAdminSlice,
+    deleteadminorder: DeleteOrderAdminSlice,
+    getadminsingleuser: GetSingleUserSlice,
+    getadminsingleproduct: GetSingleProductAdminSlice,
+    updateorderstatus: UpdateOrderStatusAdminSlice,
+    getcontacts: GetContactsAdminSlice,
+    deletecontact: DeleteContactAdminSlice,
+  }
 })

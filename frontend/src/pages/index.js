@@ -15,6 +15,7 @@ import Orders from "./profileLayouts/Orders";
 import UserProfile from "./profileLayouts/Profile";
 import OrderDetails from "./profileLayouts/OrderDetails";
 import Reviews from "./profileLayouts/Reviews";
+import Contact from './Contact'
 
 export {
   Home,
@@ -34,4 +35,5 @@ export {
   Orders,
   Reviews,
   UserProfile,
+  Contact
 };

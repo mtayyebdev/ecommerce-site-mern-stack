@@ -1,10 +1,19 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import { Outlet, NavLink } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { GetUserInfo } from '../store/slices/userSlices/GetUserInfoSlice.jsx'
+import { GetOrders } from '../store/slices/orderSlices/GetOrdersSlice.jsx'
 
 function Profile() {
   const { user } = useSelector((state) => state.userdata)
   const [menu, setmenu] = useState(false)
+  const dispatch =useDispatch()
+
+  useEffect(() => {
+    dispatch(GetUserInfo())
+    dispatch(GetOrders())
+  }, [])
+  
 
   return (
     <>
@@ -37,9 +46,6 @@ function Profile() {
                   <NavLink to={"/user/address"}><li className=" hover:text-blue-600">Address Book</li></NavLink>
                 </ul>
                 <NavLink to={"/user/orders"}><h3 className="mb-2 mt-4 font-semibold">My Orders</h3></NavLink>
-                <ul className="space-y-2 ms-4 text-sm">
-                  <NavLink to={"/user/returns"}><li className=" hover:text-blue-600">My Returns</li></NavLink>
-                </ul>
                 <NavLink to={"/user/reviews"}><h3 className="mb-2 mt-4 font-semibold">My Reviews</h3></NavLink>
                 <NavLink to={"/user/favorits"}><h3 className="mb-2 mt-4 font-semibold">My Wishlist</h3></NavLink>
               </nav>

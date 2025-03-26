@@ -41,24 +41,19 @@ const updateCartController = TryCatchHandler(async (req, res, next) => {
     return res.status(404).json({ message: "Quantity not found." });
   }
 
-  const cart = await Cart.findById(id);
+  const cart = await Cart.findByIdAndUpdate(id,{
+    quantity
+  });
 
   if (!cart) {
     return res.status(404).json({ message: "Not found." });
   }
 
-  const findProduct = await Product.findById(cart.product);
-
-  cart.price = quantity * findProduct.price;
-  cart.deliveryPrice = quantity * findProduct.deliveryPrice;
-  cart.quantity = quantity;
-  await cart.save();
-
   return res.status(200).json({ message: "Cart Updated Successfully." });
 });
 
 const createCartController = TryCatchHandler(async (req, res, next) => {
-  const { quantity } = req.body;
+  const { quantity, color, size } = req.body;
   const id = req.params.id;
 
   if (!id) {
@@ -71,19 +66,18 @@ const createCartController = TryCatchHandler(async (req, res, next) => {
     return res.status(404).json({ message: "Product not found..." });
   }
 
-  const totalPrice = quantity * product.price;
-  const totalDeliveryPrice = quantity * product.deliveryPrice;
-
   const cart = await Cart.create({
     name: product.name,
-    image: product.frontImage,
-    price: totalPrice,
+    image: product.gallaryImages[0],
+    price: product.price,
     discount: product.discountPrice,
-    deliveryPrice: totalDeliveryPrice,
+    deliveryPrice: product.deliveryPrice,
     product: product._id,
+    stock: product.stock,
     user: req.user._id,
-    color: product.color,
-    size: product.size,
+    color,
+    returns:product.returns,
+    size,
     category: product.category,
     guarantee: product.warranty,
     quantity,

@@ -8,7 +8,7 @@ function Product({ image, name, price, discount,id }) {
         <Link to={`/product/${id}`}>
         <div>
           <div className="image">
-            <img src={image} className="w-full" alt="" />
+            <img src={image} className="w-full h-[180px]" alt="" />
           </div>
           <div className="content p-2">
             <h3 className="line-clamp-2 text-sm">{name}</h3>

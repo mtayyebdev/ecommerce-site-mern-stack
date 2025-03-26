@@ -161,6 +161,16 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
                 </li>
                 <li>
                   <NavLink
+                    to="/web-admin/create-coupon"
+                    className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark ${pathname.includes('create-coupon') && 'bg-graydark'
+                      }`}
+                  >
+                    <i className="fa-solid fa-ticket-simple text-xl"></i>
+                    Create Coupon
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
                     to="/web-admin/settings"
                     className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark ${pathname.includes('settings') &&
                       'bg-graydark'

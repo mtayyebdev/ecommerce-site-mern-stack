@@ -2,7 +2,10 @@ import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema(
   {
-    orderId: String,
+    orderId: {
+      type: String,
+      unique: true,
+    },
     image: String,
     name: String,
     quantity: Number,
@@ -11,6 +14,7 @@ const orderSchema = new mongoose.Schema(
     discountPrice: Number,
     category: String,
     returns: String,
+    warranty: String,
     username: String,
     phone: String,
     address: String,
@@ -23,8 +27,8 @@ const orderSchema = new mongoose.Schema(
       default: 0,
     },
     zone: String,
-    province:String,
-    landmark:String,
+    province: String,
+    landmark: String,
     deliveryDate: String,
     status: {
       type: String,

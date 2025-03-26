@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
-// import axios from "axios";
-import { Link, useParams } from 'react-router-dom'
-// import { toast } from "react-toastify";
+import { useParams } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { GetSingleUser } from '../store/slices/adminSlices/GetSingleUserSlice.jsx'
+import { UpdateUsers } from '../store/slices/adminSlices/UpdateUserSlice.jsx'
 
 function Update_user() {
+    const dispatch = useDispatch()
+    const { user } = useSelector((state) => state.getadminsingleuser);
     const { id } = useParams();
     const [loader, setloader] = useState(false)
     const [eye, seteye] = useState(false)
@@ -13,44 +16,38 @@ function Update_user() {
     const [birthday, setbirthday] = useState("")
     const [email, setemail] = useState("");
     const [admin, setadmin] = useState(false);
-    const [avatar, setAvatar] = useState(null)
     const [password, setpassword] = useState("");
 
-
-    //   const getSingleUser = async () => {
-    //     try {
-    //       const res = await axios.get(`/api/admin/user/getsingleuser/${id}`);
-    //       if (res.status == 200) {
-    //         setusername(res.data.username);
-    //         setemail(res.data.email);
-    //         setpassword(res.data.password);
-    //       } else {
-    //         console.log(res);
-    //       }
-    //     } catch (error) {
-    //       console.log("Post error: ", error);
-    //     }
-    //   };
-
-    //   useEffect(() => {
-    //     getSingleUser();
-    //   }, []);
-
+    const getuser = async (id) => {
+        await dispatch(GetSingleUser(id))
+            .then((res) => {
+                if (res.type === "getsingleuser/fulfilled") {
+                    setusername(res.payload.data.name);
+                    setemail(res.payload.data.email);
+                    setphone(res.payload.data.phone);
+                }
+            }).catch((err) => {
+                console.log(err);
+            })
+    }
+    useEffect(() => {
+        getuser(id)
+    }, [id]);
 
     const updateUser = async () => {
         try {
-            setloader(true)
-            const formdata = new FormData()
-            formdata.append("avatar", avatar)
-            formdata.append("email", email)
-            formdata.append("password", password)
-            formdata.append("admin", admin)
-            formdata.append("gender", gender)
-            formdata.append("phone", phone)
-            formdata.append("birthday", birthday)
-
-            console.log(formdata);
-
+            setloader(true);
+            const data = {
+                username,
+                email,
+                phone,
+                birthday,
+                password,
+                gender,
+                admin,
+                id
+            }
+            dispatch(UpdateUsers(data))
         } catch (error) {
             console.log("User updating error: ", error);
         }
@@ -65,12 +62,12 @@ function Update_user() {
                     <div className=' w-[10rem] h-0.5 mt-1 bg-blue-600'></div>
                 </div>
                 <div className="space-y-6 mt-5">
-                    <div className="img flex items-center justify-center py-4">
+                    {/* <div className="img flex items-center justify-center py-4">
                         <label htmlFor="img">
                             <img src={avatar ? URL.createObjectURL(avatar) : "/sliderimg/p4.webp"} className="rounded-full w-[200px] object-cover h-[200px]" alt="user img" />
                         </label>
                         <input type="file" name="img" onChange={(e) => setAvatar(e.target.files[0])} className="hidden" id="img" />
-                    </div>
+                    </div> */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
                             <label className="text-gray-800 text-sm mb-2 block">
@@ -142,7 +139,6 @@ function Update_user() {
                                 className="absolute right-4 cursor-pointer text-gray-500"
                                 onClick={() => seteye(!eye)}
                             >
-                                {/* <FontAwesomeIcon icon={eye ? faEyeSlash : faEye} /> */}
                                 <i className={`fa-solid ${eye ? "fa-eye-slash" : "fa-eye"}`}></i>
                             </span>
                         </div>
@@ -192,7 +188,7 @@ function Update_user() {
                             >
                                 Birth Day
                             </label>
-                            <input type="date" onChange={(e)=>setbirthday(e.target.value)} name="birth" required
+                            <input type="date" onChange={(e) => setbirthday(e.target.value)} name="birth" required
                                 className=" bg-white border border-gray-300 w-full text-sm px-4 py-2.5 rounded-md outline-blue-500" id="birth" />
                         </div>
                     </div>

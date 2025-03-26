@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import AddressForm from '../../components/AddressForm';
 import { CreateUserInfo } from '../../store/slices/userSlices/CreateUserInfoSlice.jsx'
 import { useSelector, useDispatch } from 'react-redux'
@@ -27,10 +27,6 @@ function Address() {
     phoneNumber: '',
     addressType: 'Home',
   });
-
-  useEffect(() => {
-    dispatch(GetUserInfo());
-  }, []);
 
   const handleSubmit = async (word) => {
     if (word === "new") {

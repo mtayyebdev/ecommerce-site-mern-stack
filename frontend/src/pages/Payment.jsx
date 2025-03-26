@@ -7,43 +7,46 @@ import { ClearData } from '../store/slices/orderSlices/PendingOrderSlice.jsx'
 
 function Payment() {
     const { id } = useParams()
-    const [easypaisa, seteasypaisa] = useState(false)
-    const [jazzcash, setjazzcash] = useState(false)
-    const [craditcard, setcraditcard] = useState(false)
-    const [bank, setbank] = useState(false)
-    const [cashonDelivary, setcashonDelivary] = useState(false)
-    const [orderbox, setorderbox] = useState(false)
+    const [easypaisa, seteasypaisa] = useState(false);
+    const [jazzcash, setjazzcash] = useState(false);
+    const [craditcard, setcraditcard] = useState(false);
+    const [bank, setbank] = useState(false);
+    const [cashonDelivary, setcashonDelivary] = useState(false);
+    const [orderbox, setorderbox] = useState(false);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-
-    const dispatch = useDispatch()
-    const navigate = useNavigate()
-
-    const { orders } = useSelector((state) => state.pendingorder)
-    const [subItemsPrice, setsubItemsPrice] = useState(0)
+    const { orders } = useSelector((state) => state.pendingorder);
+    const [subItemsPrice, setsubItemsPrice] = useState(0);
     const [ids, setids] = useState([]);
-    const [totalPrice, settotalPrice] = useState(0)
+    const [totalPrice, settotalPrice] = useState(0);
+    const [allItems, setallItems] = useState(0)
 
     const getData = async () => {
         let totalShipping = 0;
         let subItems = 0;
+        let quantity=0;
         if (orders.length != 0 && id == "1234") {
             orders[0].forEach((order, i) => {
                 subItems += order.price;
-                setids((prev) => [...prev, order._id])
+                setids((prev) => [...prev, order._id]);
                 totalShipping += order.shippingFee;
+                quantity+=order.quantity;
             })
             let total = subItems + totalShipping;
             setsubItemsPrice(subItems);
+            setallItems(quantity)
             settotalPrice(total);
         } else if (id != "1234") {
             if (!id) {
-                return null
+                return null;
             }
 
             await dispatch(GetSingleOrder(id))
                 .then((res) => {
                     if (res.type === "getsingleorder/fulfilled") {
                         setsubItemsPrice(res.payload.order.price)
+                        setallItems(res.payload.order.quantity)
                         settotalPrice(res.payload.order.price + res.payload.order.shippingFee)
                         setids([id])
                     }
@@ -61,7 +64,7 @@ function Payment() {
             paymentStatus: "Done",
             paymentType: "CachOnDelivary",
             shipping_fee: 50,
-            orderId:""
+            orderId: ""
         }
         const order = Promise.all(
             ids.map(async (ide) => {
@@ -252,8 +255,8 @@ function Payment() {
                         <div className="right w-full md:w-[40%] lg:w-[30%] bg-white py-8 h-[170px] px-3">
                             <h2 className='font-semibold text-lg'>Order Summary</h2>
                             <div className="flex items-center justify-between gap-2 my-4">
-                                <h3 className='text-xs text-gray-400'>Subtotal({orders && orders.length} Items and shipping fee included)</h3>
-                                <h3 className='text-sm whitespace-nowrap'>Rs. {subItemsPrice}</h3>
+                                <h3 className='text-xs text-gray-400'>Subtotal({allItems} Items and shipping fee included)</h3>
+                                <h3 className='text-sm whitespace-nowrap'>Rs. {totalPrice}</h3>
                             </div>
                             <div className="flex items-center flex-row gap-2 justify-between">
                                 <h2 className='text-base font-semibold'>Total Amount</h2>

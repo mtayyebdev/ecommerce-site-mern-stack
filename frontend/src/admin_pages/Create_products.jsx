@@ -1,53 +1,101 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { Link } from 'react-router-dom'
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { CreateProduct } from '../store/slices/adminSlices/CreateProductSlice.jsx'
+import { toast } from "react-toastify";
 
 function Create_products() {
+  const dispatch = useDispatch();
   const [loader, setloader] = useState(false)
   const [name, setName] = useState("");
+  const [images, setimages] = useState([])
   const [longDescription, setlongDescription] = useState("")
   const [shortDescription, setshortDescription] = useState("")
-  const [frontimg, setFrontimg] = useState(null)
-  const [img1, setImg1] = useState(null)
-  const [img2, setImg2] = useState(null)
   const [price, setprice] = useState(0)
   const [discount_price, setdiscount_price] = useState(0)
   const [delivery_price, setdelivery_price] = useState(0)
-  const [img3, setImg3] = useState(null)
-  const [color, setcolor] = useState("")
-  const [size, setsize] = useState("")
+  const [stock, setstock] = useState(0)
   const [returnProduct, setreturnProduct] = useState(false)
   const [warranty, setwarranty] = useState(false)
   const [category, setcategory] = useState("none")
+  const [selectedColors, setSelectedColors] = useState([]);
+  const [selectedSizes, setSelectedSizes] = useState([]);
 
-  const createProduct = async() => {
+  const createProduct = async () => {
     try {
       setloader(true)
       const formData = new FormData();
-      formData.append("name", name);
-      formData.append("longDescription", longDescription);
-      formData.append("shortDescription", shortDescription);
-      formData.append("frontimg", frontimg);
-      formData.append("img1", img1);
-      formData.append("img2", img2);
-      formData.append("price", price);
-      formData.append("discount_price", discount_price);
-      formData.append("delivery_price", delivery_price);
-      formData.append("img3", img3);
-      formData.append("color", color);
-      formData.append("size", size);
-      formData.append("returnProduct", returnProduct);
-      formData.append("warranty", warranty);
-      formData.append("category", category);
+      formData.append("name", name)
+      formData.append("longDescription", longDescription)
+      formData.append("shortDescription", shortDescription)
+      formData.append("price", price)
+      formData.append("discountPrice", discount_price)
+      formData.append("deliveryPrice", delivery_price)
+      formData.append("color", [...selectedColors])
+      formData.append("size", [...selectedSizes])
+      formData.append("stock", stock)
+      formData.append("returns", returnProduct)
+      formData.append("warranty", warranty)
+      formData.append("category", category)
+      images.forEach((img) => {
+        formData.append("images", img)
+      })
 
-      console.log(formData);
-
+      await dispatch(CreateProduct(formData))
     } catch (error) {
       console.log("Product creation error ", error);
-
     }
     setloader(false);
   }
+
+  const imageUploadHandler = (e) => {
+    if (images.length > 3) {
+      return toast.error("Only 4 images are allowed...")
+    } else {
+      const files = Array.from(e.target.files)
+      setimages((prev) => [...prev, ...files])
+    }
+  }
+
+  // Array of available colors
+  const colors = [
+    "blue",
+    "red",
+    "black",
+    "white",
+    "yellow",
+    "orange",
+  ];
+
+  const sizes = [
+    "SM",
+    "MD",
+    "LG",
+    "XL",
+    "2XL",
+    "3XL",
+    "4XL",
+    "5XL",
+    "6XL",
+    "7XL",
+  ]
+
+  // Function to handle checkbox change
+  const handleColorChange = (color) => {
+    if (selectedColors.includes(color)) {
+      setSelectedColors(selectedColors.filter((c) => c !== color));
+    } else {
+      setSelectedColors([...selectedColors, color]);
+    }
+  };
+
+  // Function to handle checkbox change
+  const handleSizeChange = (size) => {
+    if (selectedSizes.includes(size)) {
+      setSelectedSizes(selectedSizes.filter((s) => s !== size));
+    } else {
+      setSelectedSizes([...selectedSizes, size]);
+    }
+  };
 
   return (
     <>
@@ -57,45 +105,27 @@ function Create_products() {
           <div className=' w-[12rem] h-0.5 mt-1 bg-blue-600'></div>
         </div>
         <div className="space-y-6 mt-5">
-          <div className="img py-4">
-            <div className="otherimgs flex flex-row gap-3 flex-wrap items-center justify-between">
-              <div className="frontimg">
-                <label htmlFor="fimg">
-                  <h2 className="mb-1 font-semibold text-lg">Front Image</h2>
-                  <img src={frontimg ? URL.createObjectURL(frontimg) : "/sliderimg/p5.webp"} alt="fimg" className="w-[150px] h-[150px]" />
-                </label>
-                <input type="file" className="hidden" name="fimg" onChange={(e) => setFrontimg(e.target.files[0])} id="fimg" />
+          <div className="img py-4 relative">
+            <i className="fa-solid fa-close absolute top-0 text-lg hover:text-site-color cursor-pointer right-3" onClick={() => setimages([])}></i>
+            <label htmlFor="fimg">
+              <div className="otherimgs flex flex-row h-[150px] space-x-2 flex-wrap items-center">
+                {
+                  images.map((img, i) => (
+                    <div className="img" key={i}>
+                      <img src={img ? URL.createObjectURL(img) : "./product.jpeg"} alt="images" className="w-[150px] h-[150px]" />
+                    </div>
+                  ))
+                }
               </div>
-              <div className="img1">
-                <label htmlFor="img1">
-                  <h2 className="mb-1 font-semibold text-lg">Image 1</h2>
-                  <img src={img1 ? URL.createObjectURL(img1) : "/sliderimg/p4.webp"} alt="fimg" className="w-[150px] h-[150px]" />
-                </label>
-                <input type="file" className="hidden" name="img1" id="img1" onChange={(e) => setImg1(e.target.files[0])} />
-              </div>
-              <div className="img2">
-                <label htmlFor="img2">
-                  <h2 className="mb-1 font-semibold text-lg">Image 2</h2>
-                  <img src={img2 ? URL.createObjectURL(img2) : "/sliderimg/p4.webp"} alt="fimg" className="w-[150px] h-[150px]" />
-                </label>
-                <input type="file" className="hidden" name="img2" id="img2" onChange={(e) => setImg2(e.target.files[0])} />
-              </div>
-              <div className="img3">
-                <label htmlFor="img3">
-                  <h2 className="mb-1 font-semibold text-lg">Image 3</h2>
-                  <img src={img3 ? URL.createObjectURL(img3) : "/sliderimg/p4.webp"} alt="fimg" className="w-[150px] h-[150px]" />
-                </label>
-                <input type="file" className="hidden" name="img3" id="img3" onChange={(e) => setImg3(e.target.files[0])} />
-              </div>
-            </div>
+            </label>
+            <input type="file" className="hidden" name="fimg" multiple onChange={imageUploadHandler} id="fimg" />
           </div>
           <div>
             <label className="text-gray-800 text-sm mb-2 block">
               Product Name
             </label>
-            <input
+            <textarea
               name="name"
-              type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -226,52 +256,67 @@ function Create_products() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div>
-              <label
-                htmlFor="color"
-                className="text-gray-800 text-sm mb-2 block"
-              >
-                Color
-              </label>
-              <select
-                name="color"
-                onChange={(e) => setcolor(e.target.value)}
-                id="color"
-                className=" bg-white border border-gray-300 w-full text-sm px-4 py-2.5 rounded-md outline-blue-500"
-              >
-                <option className="text-black">Select......</option>
-                <option value="blue" className="text-black">Blue</option>
-                <option value="red" className="text-black">Red</option>
-                <option value="black" className="text-black">Black</option>
-                <option value="white" className="text-black">White</option>
-                <option value="yellow" className="text-black">Yellow</option>
-                <option value="orange" className="text-black">Orange</option>
-              </select>
+              <label className="text-gray-800 text-sm mb-2 block">Color</label>
+              <div className="flex flex-col space-y-2">
+                {colors.map((color, index) => (
+                  <label key={index} className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      value={color}
+                      checked={selectedColors.includes(color)}
+                      onChange={() => handleColorChange(color)}
+                      className="h-4 w-4 text-blue-500 border-gray-300 rounded"
+                    />
+                    <span className="text-sm text-gray-800">{color}</span>
+                  </label>
+                ))}
+              </div>
+              {/* Display selected colors */}
+              <div className="mt-4">
+                <p className="text-sm text-gray-600">
+                  Selected Colors: {selectedColors.length > 0 ? selectedColors.join(", ") : "None"}
+                </p>
+              </div>
             </div>
             <div>
-              <label
-                htmlFor="size"
-                className="text-gray-800 text-sm mb-2 block"
-              >
-                Size
+              <label className="text-gray-800 text-sm mb-2 block">Size</label>
+              <div className="flex flex-col space-y-2">
+                {sizes.map((size, index) => (
+                  <label key={index} className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      value={size}
+                      checked={selectedSizes.includes(size)}
+                      onChange={() => handleSizeChange(size)}
+                      className="h-4 w-4 text-blue-500 border-gray-300 rounded"
+                    />
+                    <span className="text-sm text-gray-800">{size}</span>
+                  </label>
+                ))}
+              </div>
+              {/* Display selected colors */}
+              <div className="mt-4">
+                <p className="text-sm text-gray-600">
+                  Selected Sizes: {selectedSizes.length > 0 ? selectedSizes.join(", ") : "None"}
+                </p>
+              </div>
+            </div>
+            <div className="stock">
+              <label htmlFor="stock" className="text-gray-800 text-sm mb-2 block">
+                Total Stock
               </label>
-              <select
-                name="size"
-                onChange={(e) => setsize(e.target.value)}
-                id="size"
-                className=" bg-white border border-gray-300 w-full text-sm px-4 py-2.5 rounded-md outline-blue-500"
-              >
-                <option className="text-black">Select......</option>
-                <option value="sm" className="text-black">SM</option>
-                <option value="md" className="text-black">MD</option>
-                <option value="lg" className="text-black">LG</option>
-                <option value="xl" className="text-black">XL</option>
-                <option value="2xl" className="text-black">2XL</option>
-                <option value="3xl" className="text-black">3XL</option>
-                <option value="4xl" className="text-black">4XL</option>
-                <option value="5xl" className="text-black">5XL</option>
-                <option value="6xl" className="text-black">6XL</option>
-                <option value="7xl" className="text-black">7XL</option>
-              </select>
+              <div className="relative flex items-center">
+                <input
+                  name="stock"
+                  type="number"
+                  id="stock"
+                  value={stock}
+                  onChange={(e) => setstock(e.target.value)}
+                  required
+                  className=" bg-white border border-gray-300 w-full text-sm px-4 py-2.5 rounded-md outline-blue-500"
+                  placeholder="Enter Total Stock"
+                />
+              </div>
             </div>
           </div>
           <div>

@@ -20,6 +20,10 @@ const cartSchema = new mongoose.Schema(
       required: true,
       default: 0,
     },
+    returns:{
+      type: String,
+      required: true,
+    },
     deliveryPrice: {
       type: Number,
       required: true,
@@ -36,6 +40,10 @@ const cartSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true
+    },
+    stock:{
+      type:Number,
+      default:0
     },
     color:String,
     size:String,

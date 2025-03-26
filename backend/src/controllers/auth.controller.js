@@ -1,6 +1,5 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import Order from "../models/order.model.js";
 import UserInfo from "../models/userinfo.model.js";
 import { UploadFile } from "../middlewares/uploadFile.middleware.js";
@@ -63,24 +62,13 @@ const LoginController = TryCatchHandler(async (req, res, next) => {
     return res.status(404).json({ message: "Invalid Phone or Password..." });
   }
 
-  const passExist = await bcrypt.compare(password, phoneExist.password);
+  const passExist = phoneExist.ComparePassword(password);
 
   if (!passExist) {
     return res.status(404).json({ message: "Invalid Phone or Password..." });
   }
 
-  const jwtToken = jwt.sign(
-    {
-      id: phoneExist._id,
-      phoneId: phoneExist.phone,
-      emailId: phoneExist.email,
-      admin: phoneExist.isAdmin,
-    },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: "10d",
-    }
-  );
+  const jwtToken = await phoneExist.GenarateJWTToken();
 
   const tenDaysInMilliseconds = 10 * 24 * 60 * 60 * 1000; // 10 days
 
@@ -329,25 +317,28 @@ const createUserOrderController = TryCatchHandler(async (req, res, next) => {
         color: order.color,
         country: allData.infoData.country,
         city: allData.infoData.city,
-        zipCode: allData.infoData.zone,
+        zone: allData.infoData.zone,
         address: allData.infoData.address,
         deliveryDate: "pending",
         image: order.image,
         phone: allData.infoData.phone,
-        price: order.price,
+        price: order.price * order.quantity,
         product: order.productId,
         quantity: order.quantity,
-        shippingFee: order.deliveryPrice,
+        warranty: order.guarantee,
+        shippingFee: order.deliveryPrice * order.quantity,
         size: order.size,
         orderId: numericId,
         deliveryPlace: allData.infoData.addressType,
         username: allData.infoData.name,
         category: order.category,
-        returns: order.guarantee,
+        returns: order.returns,
         discountPrice: order.discount,
         user: req.user._id,
         paymentType: allData.paymentType,
         totalDiscount: order.totalDiscount,
+        landmark: allData.infoData.landmark,
+        province: allData.infoData.province,
       });
 
       return result;

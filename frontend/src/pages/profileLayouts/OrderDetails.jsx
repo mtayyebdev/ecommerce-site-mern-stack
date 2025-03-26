@@ -7,7 +7,6 @@ import { CancelOrder } from '../../store/slices/orderSlices/CancelOrderSlice.jsx
 function OrderDetails() {
     const { id } = useParams();
     const order = useSelector((state) => state.getsingleorder.order);
-
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -35,7 +34,7 @@ function OrderDetails() {
                             {order && order.status != "Cancelled" && order.paymentType == "None" ? <Link to={`/payment/${order && order._id}`}>
                                 <button className="bg-[rgb(236,240,247)] py-0.5 px-3 rounded-full hover:bg-site-color hover:text-white">Menage Payment</button>
                             </Link> : ""}
-                            {order && order.status != "Cancelled" ?
+                            {order && order.status == "Pending" || order&&order.status=="On Route" ?
                                 <button className="bg-[rgb(255,39,39)] py-0.5 px-3 rounded-full hover:bg-red-600 text-white" onClick={cancelOrderHandler}>Cancel Order</button>
                                 : ""}
                             <h2 className="bg-[rgb(236,240,247)] py-0.5 px-3 rounded-full">
@@ -94,7 +93,7 @@ function OrderDetails() {
                     <div className="right w-full md:w-1/2 text-sm bg-white py-4 px-3 pb-6">
                         <h2 className="text-xl font-semibold">Total Summary</h2>
                         <div className="flex items-center justify-between mt-2">
-                            <h4 className="">Subtotal(1 Item)</h4>
+                            <h4 className="">Subtotal({order&&order.quantity} Item)</h4>
                             <h4>Rs. {order && order.price}</h4>
                         </div>
                         <div className="flex items-center mb-3 justify-between mt-1">

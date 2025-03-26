@@ -22,23 +22,11 @@ const productSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    frontImage: {
-      type: String,
+    gallaryImages: {
+      type: [],
       required: true,
     },
-    image1: {
-      type: String,
-      required: true,
-    },
-    image2: {
-      type: String,
-      required: true,
-    },
-    image3: {
-      type: String,
-      required: true,
-    },
-    return: {
+    returns: {
       type: String,
       required: true,
     },
@@ -51,22 +39,23 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
     reviews: {
-      total: {
-        type: String,
-        default: 0,
-      },
-      comment: [],
+      type: Number,
+      default: 0,
     },
     category: {
       type: String,
       required: true,
     },
-    solds: {
-      type: String,
+    stock: {
+      type: Number,
       default: 0,
     },
-    size: String,
-    color: String,
+    solds: {
+      type: Number,
+      default: 0,
+    },
+    size: Array,
+    color: Array,
   },
   { timestamps: true }
 );
