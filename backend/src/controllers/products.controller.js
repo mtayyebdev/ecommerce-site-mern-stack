@@ -31,20 +31,58 @@ const getSingleProductController = TryCatchHandler(async (req, res, next) => {
 
 const SearchProductsController = TryCatchHandler(async (req, res) => {
   const { s } = req.query;
+  const data = req.body;
 
-  const products = await Product.find({
-    $or: [
-      { name: { $regex: s, $options: "i" } },
-      { category: { $regex: s, $options: "i" } },
-    ],
-  });
-
-  if (!products) {
-    return res.status(404).json({
-      message: "Products not found.",
+  if (!s) {
+    return res.status(400).json({
+      message: "Search query is required.",
       success: false,
     });
   }
+
+  const filterConditions = {};
+
+  if (data.filtercolors.length > 0) {
+    filterConditions.color = {
+      $in: data.filtercolors,
+    };
+  }
+
+  if (data.minPrice || data.maxPrice) {
+    filterConditions.price = {};
+    if (data.minPrice) {
+      filterConditions.price.$gte = parseInt(data.minPrice);
+    }
+    if (data.maxPrice) {
+      filterConditions.price.$lte = parseInt(data.maxPrice);
+    }
+  }
+
+  const pipeline = [
+    {
+      $match: {
+        $or: [
+          { name: { $regex: s, $options: "i" } },
+          { category: { $regex: s, $options: "i" } },
+        ],
+      },
+    },
+  ];
+
+  if (Object.keys(filterConditions).length > 0) {
+    pipeline.push({ $match: filterConditions });
+  }
+  if (data.filterLimit) {
+    pipeline.push({ $limit: data.filterLimit });
+  }
+  if (data.filterSkip) {
+    pipeline.push({ $skip: data.filterSkip });
+  }
+  if (data.filterFormat) {
+    pipeline.push({ $sort: { price: parseInt(data.filterFormat) } });
+  }
+
+  let products = await Product.aggregate(pipeline);
 
   return res.status(200).json({
     message: "Products found...",
@@ -97,17 +135,10 @@ const SentProductsCommentController = TryCatchHandler(async (req, res) => {
   });
 });
 
-const getProductReviewsController = TryCatchHandler(async (req, res) => {  
+const getProductReviewsController = TryCatchHandler(async (req, res) => {
   const Product_id = req.params.id;
-  // const Product_id = new mongoose.Types.ObjectId(req.params.id);
-  // console.log(Product_id);
-  
 
   const comments = await ProductReview.find({ product: Product_id });
-
-  // const comments = await ProductReview.aggregate([
-  //   { $match: { product: Product_id } },
-  // ]);
 
   return res.status(200).json({
     message: "Comments found.",

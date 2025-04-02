@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-export const SearchProducts = createAsyncThunk('searchproducts', async (data, { rejectWithValue }) => {
+export const SearchProducts = createAsyncThunk('searchproducts', async ({ query, datas }, { rejectWithValue }) => {    
     try {
-        const res = await axios.get(`${import.meta.env.VITE_API}/api/product/search?s=${data}`)
+        const res = await axios.post(`${import.meta.env.VITE_API}/api/product/search?s=${query}`, datas)
         return res.data;
     }
     catch (error) {
@@ -20,17 +20,17 @@ const SearchProductsSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-        .addCase(SearchProducts.pending, (state) => {
-            state.loading = true;
-        })
-        .addCase(SearchProducts.fulfilled, (state, action) => {
-            state.loading = false;
-            state.products = action.payload.data;
-        })
-        .addCase(SearchProducts.rejected, (state, action) => {
-            state.loading = false;
-            state.err = action.payload;
-        })
+            .addCase(SearchProducts.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(SearchProducts.fulfilled, (state, action) => {
+                state.loading = false;
+                state.products = action.payload.data;
+            })
+            .addCase(SearchProducts.rejected, (state, action) => {
+                state.loading = false;
+                state.err = action.payload;
+            })
     }
 });
 

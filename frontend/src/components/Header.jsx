@@ -13,20 +13,20 @@ function Header() {
   const { user } = useSelector((state) => state.userdata);
   const { cart } = useSelector((state) => state.getcart)
   const [searchBox, setsearchBox] = useState("")
-  const [list, setlist] = useState(false)
+  // const [list, setlist] = useState(false)
 
   useEffect(() => {
     dispatch(UserData())
     dispatch(GetCart())
   }, [])
 
-  const searchHandler = (e) => {
-    setsearchBox(e.target.value)
-    if (e.target.value.length >= 1) {
-      setlist(true)
-    } else {
-      setlist(false)
-    }
+  const searchHandler = () => {
+    // if (e.target.value.length >= 1) {
+    //   setlist(true)
+    // } else {
+    //   setlist(false)
+    // }
+    navigate(`/shop?search=${searchBox}`)
   }
 
   const logoutHandler = async () => {
@@ -105,10 +105,10 @@ function Header() {
                     name="search"
                     id="search"
                     value={searchBox}
-                    onChange={searchHandler}
+                    onChange={(e)=>setsearchBox(e.target.value)}
                     placeholder="Search Here..."
                   />
-                  <div className={`absolute ${list ? "block" : "hidden"} top-10 z-10 left-0 text-black bg-white w-full py-1 shadow-md`}>
+                  {/* <div className={`absolute ${list ? "block" : "hidden"} top-10 z-10 left-0 text-black bg-white w-full py-1 shadow-md`}>
                     <ul>
                       <li className="my-1 hover:bg-slate-100">
                         <Link to={"/shop?search=home"} className="w-full">
@@ -118,9 +118,9 @@ function Header() {
                         </Link>
                       </li>
                     </ul>
-                  </div>
+                  </div> */}
                 </div>
-                <button className="text-site-color bg-[rgb(255,225,210)] hover:bg-[rgb(241,206,188)] text-xl py-[7px] px-3">
+                <button className="text-site-color bg-[rgb(255,225,210)] hover:bg-[rgb(241,206,188)] text-xl py-[7px] px-3" onClick={searchHandler}>
                   <i className="fa-solid fa-search"></i>
                 </button>
               </div>
@@ -186,10 +186,10 @@ function Header() {
                 name="search"
                 id="search"
                 value={searchBox}
-                onChange={searchHandler}
+                onChange={(e)=>setsearchBox(e.target.value)}
                 placeholder="Search Here..."
               />
-              <div className={`absolute ${list ? "block" : "hidden"} top-10 left-0 text-black bg-white w-full py-1 shadow-md`}>
+              {/* <div className={`absolute ${list ? "block" : "hidden"} top-10 left-0 text-black bg-white w-full py-1 shadow-md`}>
                 <ul>
                   <li className="my-1 hover:bg-slate-100">
                     <Link to={"/shop?search=home"} className="w-full">
@@ -199,9 +199,9 @@ function Header() {
                     </Link>
                   </li>
                 </ul>
-              </div>
+              </div> */}
             </div>
-            <button className="text-site-color bg-[rgb(255,225,210)] hover:bg-[rgb(241,206,188)] text-xl py-[7px] px-3">
+            <button className="text-site-color bg-[rgb(255,225,210)] hover:bg-[rgb(241,206,188)] text-xl py-[7px] px-3" onClick={searchHandler}>
               <i className="fa-solid fa-search"></i>
             </button>
           </div>

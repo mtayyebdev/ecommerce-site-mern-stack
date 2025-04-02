@@ -47,7 +47,7 @@ function Products() {
   const loadAllProducts=()=>{
     setAllProducts(products && [...products.data].reverse());
   }
-
+  
 
   return (
     <div className="w-full">
@@ -126,7 +126,7 @@ function Products() {
                     {product.stock}
                   </td>
                   <td className="px-6 py-4">
-                    {product.reviews.total}
+                    {product.reviews}
                   </td>
                   <td className="px-6 py-4">
                     <Link to={`/web-admin/update-product/${product._id}`}><i className='fa-solid fa-edit cursor-pointer hover:text-site-color'></i></Link>

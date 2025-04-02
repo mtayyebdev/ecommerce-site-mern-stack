@@ -13,7 +13,7 @@ const ProductRouter = express.Router();
 
 ProductRouter.route("/getproducts").get(getProductsController);
 ProductRouter.route("/getsingleproduct/:id").get(getSingleProductController);
-ProductRouter.route("/search").get(SearchProductsController);
+ProductRouter.route("/search").post(SearchProductsController);
 ProductRouter.route("/send-comment/:id").post(
   UserVerify,
   upload.single("image"),
