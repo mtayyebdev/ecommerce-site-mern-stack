@@ -76,7 +76,7 @@ const LoginController = TryCatchHandler(async (req, res, next) => {
     httpOnly: true,
     maxAge: tenDaysInMilliseconds,
   });
-
+console.log(jwtToken);
   return res.status(200).json({ message: "Login Successfully..." });
 });
 
