@@ -74,8 +74,6 @@ const LoginController = TryCatchHandler(async (req, res, next) => {
 
   res.cookie("token", jwtToken, {
     httpOnly: true,
-    secure: true, // Required for HTTPS
-  sameSite: "Strict", // ya "Lax" or "None" based on frontend-backend setup
     maxAge: tenDaysInMilliseconds,
   });
 console.log(jwtToken);
