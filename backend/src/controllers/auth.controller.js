@@ -73,9 +73,12 @@ const LoginController = TryCatchHandler(async (req, res, next) => {
   const tenDaysInMilliseconds = 10 * 24 * 60 * 60 * 1000; // 10 days
 
   res.cookie("token", jwtToken, {
-    httpOnly: true,
-    maxAge: tenDaysInMilliseconds,
-  });
+  httpOnly: true,
+  secure: true,
+  sameSite: "None", // Needed if frontend is on different domain (e.g., React + Express separate)
+  maxAge: tenDaysInMilliseconds,
+});
+
 console.log(jwtToken);
   return res.status(200).json({ message: "Login Successfully..." });
 });
